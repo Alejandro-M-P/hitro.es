@@ -1,22 +1,46 @@
+---
+interface Props {
+	title: string;
+    description?: string;
+}
+
+const { title, description = "HITRO - Defensa Personal y Alto Rendimiento en Valencia" } = Astro.props;
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="es" class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{title}</title>
+
+        <!-- FUENTES GOOGLE -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+        <!-- SCRIPT ICONOS -->
+        <script src="https://unpkg.com/lucide@latest"></script>
 	</head>
-	<body>
+	<body class="bg-brand-bg text-brand-text antialiased selection:bg-brand-blue selection:text-white">
 		<slot />
+
+        <script is:inline>
+            lucide.createIcons();
+        </script>
 	</body>
 </html>
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+<style is:global>
+	body { font-family: "Plus Jakarta Sans", sans-serif; }
+    h1, h2, h3, h4, h5, h6 { font-family: "Syne", sans-serif; }
+
+    /* Scrollbar oscura */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #262626; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
 </style>
