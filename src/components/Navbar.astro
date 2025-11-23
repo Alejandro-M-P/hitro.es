@@ -4,49 +4,46 @@
 
 <nav class="fixed top-4 w-full z-50 px-4 flex flex-col items-center">
 
-    <!-- 1. LA CÁPSULA VISIBLE (Siempre visible) -->
-    <div class="relative w-fit max-w-5xl bg-black/90 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 flex items-center gap-4 md:gap-8 shadow-2xl shadow-blue-900/20 z-50">
 
-        <!-- LOGO -->
-        <a href="/" class="text-lg font-bold italic tracking-tighter text-white hover:scale-105 transition-transform">
+    <div class="relative w-full max-w-7xl bg-black/90 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 flex justify-between items-center shadow-2xl shadow-blue-900/20 z-50">
+
+        <!-- A. LOGO (Izquierda) -->
+        <a href="/" class="text-xl font-bold italic tracking-tighter text-white hover:scale-105 transition-transform">
             <span class="text-blue-600">H</span>ITRO
         </a>
 
+        <!--====MENU====== -->
 
-        <div class="hidden md:flex items-center gap-6 text-xs font-bold text-gray-400">
+        <div class="hidden md:flex items-center gap-8 text-sm font-bold text-gray-400 absolute left-1/2 -translate-x-1/2">
             <a href="#metodo" class="hover:text-white transition-colors uppercase tracking-wide">El Método</a>
             <a href="#tarifas" class="hover:text-white transition-colors uppercase tracking-wide">Admisión</a>
-            <a href="/aula-virtual" class="text-blue-500 hover:text-white transition-colors uppercase tracking-wide flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Aula
+            <a href="#aula-virtual" class="text-blue-500 hover:text-white transition-colors uppercase tracking-wide flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Aula Virtual
             </a>
         </div>
 
-        <!-- DIVISOR ) -->
-        <div class="h-4 w-px bg-white/20 md:hidden"></div>
 
-        <!-- BOTÓN TIENDA -->
-        <a href="/tienda" class="bg-white text-black px-4 py-2 rounded-full text-[10px] font-black hover:bg-blue-600 hover:text-white transition-all uppercase tracking-widest flex items-center gap-2">
-            TIENDA
-        </a>
+        <div class="flex items-center gap-4">
 
-        <!--
-        BOTÓN HAMBURGUESA
-        -->
-        <button id="menu-btn" class="text-white md:hidden p-1 focus:outline-none ml-2">
-            <!-- Icono de 3 rayas -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-        </button>
+
+            <a href="/tienda" class="bg-white text-black px-5 py-2 rounded-full text-[10px] font-black hover:bg-blue-600 hover:text-white transition-all uppercase tracking-widest flex items-center gap-2">
+                TIENDA
+            </a>
+
+            <!-- Botón Hamburguesa (Solo Móvil) -->
+            <button id="menu-btn" class="text-white md:hidden p-1 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+        </div>
 
     </div>
 
-    <!--
-     EL MENÚ DESPLEGABLE
-    -->
-    <div id="mobile-menu" class="hidden absolute top-20 w-[95%] max-w-sm bg-[#0a0a0a] border border-[#262626] rounded-2xl p-4 flex-col gap-2 shadow-2xl z-40 origin-top animate-in slide-in-from-top-5">
+
+    <div id="mobile-menu" class="hidden absolute top-20 w-[95%] max-w-7xl bg-[#0a0a0a] border border-[#262626] rounded-2xl p-4 flex-col gap-2 shadow-2xl z-40 origin-top animate-in slide-in-from-top-5">
         <a href="#metodo" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-bold text-center">El Método</a>
         <a href="#tarifas" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-bold text-center">Admisión</a>
-        <a href="/aula-virtual" class="block px-4 py-3 rounded-xl text-blue-500 bg-blue-500/10 hover:bg-blue-500/20 transition-colors font-bold text-center flex justify-center gap-2">
+        <a href="#aula-virtual" class=" px-4 py-3 rounded-xl text-blue-500 bg-blue-500/10 hover:bg-blue-500/20 transition-colors font-bold text-center flex justify-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             Aula Virtual
         </a>
@@ -54,13 +51,11 @@
 
 </nav>
 
-<!-- 3. LA INTELIGENCIA (JavaScript) -->
 <script>
     const btn = document.getElementById('menu-btn');
     const menu = document.getElementById('mobile-menu');
 
     btn?.addEventListener('click', () => {
-        // Toggle: Si está oculto lo muestra, si está visible lo oculta
         menu?.classList.toggle('hidden');
         menu?.classList.toggle('flex');
     });
