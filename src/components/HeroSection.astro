@@ -1,24 +1,100 @@
-<header class="relative min-h-screen flex flex-col justify-center pt-32 pb-10 px-4 overflow-hidden">
+---
+// src/components/Hero.astro
+---
 
+<header class="relative min-h-screen flex flex-col justify-center pt-24 md:pt-32 pb-10 px-4 overflow-hidden">
 
-    <div class="max-w-7xl mx-auto w-full">
+    <!-- FONDOS -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[0.05] -z-10"></div>
+    <div class="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-blue-600/10 rounded-full blur-[80px] md:blur-[120px] -z-10"></div>
 
+    <div class="max-w-7xl mx-auto w-full relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-auto md:auto-rows-[minmax(180px,auto)]">
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- CAJA 1: TÍTULO -->
+            <div class="col-span-1 md:col-span-7 md:row-span-2 bg-neutral-900 border border-white/10 rounded-[2rem] p-6 md:p-12 flex flex-col justify-center gap-6 md:gap-10 relative overflow-hidden group transition-all duration-300 hover:border-blue-600 hover:-translate-y-2 hover:shadow-2xl shadow-blue-900/10">
+                <div>
+                    <span class="text-blue-500 text-[10px] font-black uppercase tracking-widest border border-blue-900/30 bg-blue-900/10 px-3 py-1 rounded-md inline-block mb-4 md:mb-6 font-sans">
+                        DEFENSA PERSONAL VALENCIA
+                    </span>
+                    <h1 class="text-3xl md:text-3xl font-display font-black mb-4 md:mb-6 text-white leading-[0.9] tracking-tighter">
+                        MÁS QUE <br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-white">AUTODEFENSA.</span>
+                    </h1>
+                    <p class="text-gray-300 text-base md:text-xl max-w-md leading-relaxed font-medium font-sans">
+                        Evoluciona con el <strong class="text-white">Método Hitro</strong>. Recursos reales para vivir con seguridad, confianza y disciplina.
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <a href="#tarifas" class="inline-flex items-center gap-3 bg-blue-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold hover:scale-[1.02] hover:bg-blue-500 transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] font-sans w-fit text-sm md:text-base">
+                        Solicitar Ingreso
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
 
+            <!-- CAJA 2: AULA VIRTUAL -->
+            <a href="/aula-virtual" class="col-span-1 md:col-span-5 md:row-span-2 bg-neutral-900 border border-white/10 rounded-[2rem] relative overflow-hidden group cursor-pointer h-80 md:h-auto md:min-h-[450px] transition-all duration-300 hover:border-blue-600 hover:-translate-y-2 hover:shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800&auto=format&fit=crop"
+                    alt="Entrenamiento"
+                    class="absolute inset-0 w-full h-full object-cover object-center grayscale opacity-60 group-hover:opacity-80 transition-all duration-500">
 
-            <div class="bg-red-400 min-h-[500px] md:col-span-7 rounded-3xl">
-				<h2 class="text-center justify-center  ">MAS QUE <span class=" text-transparent bg-gradient-to-r from-blue-600 via-white bg-clip-text">AUTODEFENSA </span></h2>
-			</div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
 
+                <div class="absolute bottom-0 left-0 p-6 md:p-10 w-full z-10 flex flex-col gap-2">
 
-            <div class="bg-white min-h-[500px] md:col-span-5 rounded-3xl"></div>
+                    <h3 class="text-2xl md:text-3xl font-display font-black text-white flex items-center gap-2">
+                        Aula Virtual
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500">
+                            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+                        </svg>
+                    </h3>
+                    <p class="text-gray-300 text-sm font-medium font-sans">
+                        Accede a la videoteca técnica. Repasa lo aprendido en clase desde casa.
+                    </p>
+                </div>
+            </a>
 
+            <!-- CAJA 3: HEAD COACH -->
+            <a href="sobre-mi" class="col-span-1 md:col-span-4 bg-blue-600 border border-blue-500 rounded-[2rem] p-6 md:p-10 flex flex-col justify-between h-48 md:h-56 relative overflow-hidden group shadow-lg transition-all duration-300 hover:border-blue-600 hover:-translate-y-2 hover:shadow-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white md:w-9 md:h-9">
+                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                </svg>
+                <div>
+                    <h3 class="text-xl md:text-2xl font-display font-black text-white uppercase tracking-tight">
+                        Sobre Mi
+                    </h3>
+                    <p class="text-blue-100 text-xs md:text-sm font-medium font-sans mt-1">
+                        Leer Bibliografia
+                    </p>
+                </div>
+            </a>
 
-            <div class="bg-green-600 h-64 md:col-span-4 rounded-3xl"></div>
-
-
-            <div class="bg-blue-400 h-64 md:col-span-8 rounded-3xl"></div>
+            <!-- CAJA 4: TIENDA OFICIAL -->
+            <a href="/tienda" class="col-span-1 md:col-span-8 bg-neutral-900 border border-white/10 rounded-[2rem] p-6 md:p-10 flex items-center justify-between h-48 md:h-56 group transition-all duration-300 hover:border-blue-600 hover:-translate-y-2 hover:shadow-2xl shadow-xl cursor-pointer">
+                <div class="flex items-center gap-4 md:gap-8">
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 md:w-7 md:h-7">
+                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-black text-white text-xl md:text-3xl uppercase tracking-tight">
+                            Tienda Oficial
+                        </h3>
+                        <p class="text-gray-400 text-xs md:text-base font-medium font-sans mt-1">
+                            Equipación técnica, guantes y ropa casual.
+                        </p>
+                    </div>
+                </div>
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center text-black group-hover:rotate-45 transition-transform shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+                    </svg>
+                </div>
+            </a>
 
         </div>
     </div>

@@ -5,18 +5,20 @@ export default {
 		extend: {
 			colors: {
 				brand: {
-					bg: "#050505", // Negro Fondo
-					card: "#0a0a0a", // Negro Tarjeta
-					border: "#262626", // Borde Gris
-					blue: "#3b82f6", // Azul Eléctrico
-					text: "#e2e8f0", // Texto Claro
-					muted: "#94a3b8", // Texto Gris
+					bg: "#050505", // Fondo principal
+					card: "#0a0a0a", // Fondo de las tarjetas
+					border: "#262626", // Bordes finos
+					blue: "#3b82f6", // El Azul de HITRO
+					text: "#e2e8f0", // Texto blanco roto
+					muted: "#94a3b8", // Texto gris secundario
 				},
 			},
 			fontFamily: {
+				// Aquí definimos las dos fuentes
 				sans: ['"Plus Jakarta Sans"', "sans-serif"],
 				display: ['"Syne"', "sans-serif"],
 			},
+			// Animaciones para que se sienta premium
 			animation: {
 				"fade-in": "fadeIn 0.6s ease-out forwards",
 			},
