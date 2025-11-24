@@ -1,0 +1,96 @@
+---
+// src/components/Proceso-admision.astro
+---
+
+<section class="py-16 md:py-24 px-4 bg-[#050505] border-t border-[#262626] relative overflow-hidden">
+
+    <!-- CONTENEDOR CENTRAL -->
+    <div class="max-w-7xl mx-auto relative z-10">
+
+        <!-- ========================================== -->
+        <!-- 1. CABECERA (Título y Explicación)         -->
+        <!-- ========================================== -->
+        <div class="flex flex-col items-center text-center gap-6 mb-12 md:mb-16">
+
+            <!-- Etiqueta "Acceso Restringido" (Estilo Píldora Roja) -->
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-red-500/30 bg-red-900/10 text-red-400 text-[10px] font-black uppercase tracking-widest font-sans shadow-[0_0_15px_rgba(220,38,38,0.2)]">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                ACCESO RESTRINGIDO
+            </span>
+
+            <!-- Título Principal y Texto Descriptivo -->
+            <div class="max-w-3xl flex flex-col gap-4">
+                <h2 class="text-3xl md:text-5xl font-display font-black text-white uppercase tracking-tighter leading-tight">
+                    PROCESO DE <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">ADMISIÓN</span>
+                </h2>
+                <p class="text-gray-400 text-sm md:text-lg font-medium font-sans leading-relaxed text-balance">
+                    En HITRO no buscamos clientes, buscamos alumnos comprometidos. Para garantizar la calidad de la enseñanza,
+                    <strong class="text-white">la admisión requiere una entrevista previa con el Coach.</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 2. GRID DE PASOS (3 Pasos)                 -->
+        <!-- Móvil: 1 columna / PC: 3 columnas          -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+
+            <!-- Elemento Decorativo: Línea conectora (Solo visible en PC) -->
+            <div class="hidden md:block absolute top-10 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#262626] to-transparent -z-10"></div>
+
+            <!-- PASO 1: SOLICITUD -->
+            <div class="bg-neutral-900 border border-white/10 p-8 rounded-[2rem] flex flex-col items-center text-center gap-6 group hover:border-blue-600 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl shadow-black">
+                <!-- Número Circular -->
+                <div class="w-16 h-16 bg-[#050505] border border-white/10 rounded-2xl flex items-center justify-center text-2xl font-display font-black text-white shadow-inner group-hover:text-blue-500 group-hover:border-blue-500/30 transition-colors relative z-10">
+                    1
+                </div>
+                <!-- Textos -->
+                <div class="flex flex-col gap-2">
+                    <h3 class="text-xl font-display font-black text-white uppercase tracking-wide group-hover:text-blue-400 transition-colors">
+                        Solicitud
+                    </h3>
+                    <p class="text-gray-400 text-sm leading-relaxed font-sans">
+                        Elige tu plan y envía tu solicitud de contacto a través de la web.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PASO 2: ENTREVISTA -->
+            <div class="bg-neutral-900 border border-white/10 p-8 rounded-[2rem] flex flex-col items-center text-center gap-6 group hover:border-blue-600 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl shadow-black">
+                <!-- Número Circular -->
+                <div class="w-16 h-16 bg-[#050505] border border-white/10 rounded-2xl flex items-center justify-center text-2xl font-display font-black text-white shadow-inner group-hover:text-blue-500 group-hover:border-blue-500/30 transition-colors relative z-10">
+                    2
+                </div>
+                <!-- Textos -->
+                <div class="flex flex-col gap-2">
+                    <h3 class="text-xl font-display font-black text-white uppercase tracking-wide group-hover:text-blue-400 transition-colors">
+                        Entrevista
+                    </h3>
+                    <p class="text-gray-400 text-sm leading-relaxed font-sans">
+                        Reunión presencial con el Coach para evaluar aptitud y compromiso.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PASO 3: ACCESO -->
+            <div class="bg-neutral-900 border border-white/10 p-8 rounded-[2rem] flex flex-col items-center text-center gap-6 group hover:border-blue-600 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl shadow-black">
+                <!-- Número Circular -->
+                <div class="w-16 h-16 bg-[#050505] border border-white/10 rounded-2xl flex items-center justify-center text-2xl font-display font-black text-white shadow-inner group-hover:text-blue-500 group-hover:border-blue-500/30 transition-colors relative z-10">
+                    3
+                </div>
+                <!-- Textos -->
+                <div class="flex flex-col gap-2">
+                    <h3 class="text-xl font-display font-black text-white uppercase tracking-wide group-hover:text-blue-400 transition-colors">
+                        Acceso
+                    </h3>
+                    <p class="text-gray-400 text-sm leading-relaxed font-sans">
+                        Si eres apto, formalizamos la matrícula y empiezas a entrenar.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
