@@ -1,20 +1,20 @@
 ---
-// Definición centralizada de links para fácil mantenimiento
+// src/components/index/NavBar.astro
 const scrollLinks = [
-  { name: 'El Método', href: '#metod' },
-  { name: 'Admisión', href: '#admission' },
-  { name: 'Entrenamiento', href: '#training' },
-  { name: 'Coach', href: '#coach' },
+  { name: 'El Método', href: '/#metod' },
+  { name: 'Admisión', href: '/#admission' },
+  { name: 'Entrenamiento', href: '/#training' },
+  { name: 'Coach', href: '/#coach' },
 ];
 
 const externalLinks = [
-  { name: 'Aula Virtual', href: '/aula-virtual', style: 'text-blue-500 hover:text-white' },
-  { name: 'TIENDA', href: '/tienda', style: 'bg-white text-black px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white' }
+  { name: 'Aula Virtual', href: '/AulaVirtual', style: 'text-blue-500 hover:text-white' },
+  { name: 'TIENDA', href: '/Store', style: 'bg-white text-black px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white' }
 ];
 ---
 
 <nav class="fixed top-4 w-full z-50 px-4 flex flex-col items-center">
-  <div class="relative w-full max-w-7xl bg-black/90 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 flex justify-between items-center shadow-2xl z-50 transition-all hover:border-blue-500/30">
+  <div class="relative w-full max-w-7xl bg-black/90 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 flex justify-between items-center shadow-2xl z-50">
     
     <a href="/" class="text-xl font-bold italic text-white font-display">
       <span class="text-blue-600">H</span>ITRO
@@ -22,68 +22,19 @@ const externalLinks = [
 
     <div class="hidden md:flex items-center gap-8 text-sm font-bold text-gray-400 absolute left-1/2 -translate-x-1/2">
       {scrollLinks.map(link => (
-        <a href={link.href} class="nav-scroll-link hover:text-white transition-colors uppercase tracking-wide">
+        <a href={link.href} class="hover:text-white transition-colors uppercase tracking-wide">
           {link.name}
         </a>
       ))}
-      <a href={externalLinks[0].href} target="_blank" rel="noopener noreferrer" class={`${externalLinks[0].style} transition-colors uppercase tracking-wide flex items-center gap-1`}>
+      <a href={externalLinks[0].href} class={`${externalLinks[0].style} transition-colors uppercase tracking-wide flex items-center gap-1`}>
         {externalLinks[0].name}
       </a>
     </div>
 
     <div class="flex items-center gap-4">
-      <a href={externalLinks[1].href} target="_blank" rel="noopener noreferrer" class={`${externalLinks[1].style} text-[10px] font-black transition-all uppercase tracking-widest`}>
+      <a href={externalLinks[1].href} class={`${externalLinks[1].style} text-[10px] font-black transition-all uppercase tracking-widest`}>
         {externalLinks[1].name}
       </a>
-      <button id="menu-btn" class="text-white md:hidden p-1 focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-      </button>
     </div>
   </div>
-
-  <div id="mobile-menu" class="hidden absolute top-20 w-[95%] max-w-7xl bg-[#0a0a0a] border border-[#262626] rounded-2xl p-4 flex-col gap-2 shadow-2xl z-40 transition-all duration-300 opacity-0 -translate-y-4 scale-95">
-    {scrollLinks.map(link => (
-      <a href={link.href} class="nav-scroll-link block px-4 py-3 rounded-xl text-gray-300 hover:bg-white/5 font-bold text-center uppercase tracking-wide">
-        {link.name}
-      </a>
-    ))}
-    <hr class="border-white/5 my-2" />
-    <a href="/aula-virtual" target="_blank" rel="noopener noreferrer" class="block px-4 py-3 rounded-xl text-blue-500 bg-blue-500/10 font-bold text-center uppercase">Aula Virtual</a>
-  </div>
 </nav>
-
-<script>
-  const btn = document.getElementById('menu-btn');
-  const menu = document.getElementById('mobile-menu');
-  const scrollLinks = document.querySelectorAll('.nav-scroll-link');
-
-  // 1. Toggle Menú Móvil
-  function toggleMenu() {
-    const isHidden = menu?.classList.contains('hidden');
-    if (isHidden) {
-      menu?.classList.replace('hidden', 'flex');
-      setTimeout(() => menu?.classList.remove('opacity-0', '-translate-y-4', 'scale-95'), 10);
-    } else {
-      menu?.classList.add('opacity-0', '-translate-y-4', 'scale-95');
-      setTimeout(() => menu?.classList.replace('flex', 'hidden'), 300);
-    }
-  }
-
-  btn?.addEventListener('click', toggleMenu);
-
-  // 2. Smooth Scroll con validación
-  scrollLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      const href = link.getAttribute('href');
-      if (href?.startsWith('#')) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          if (menu && !menu.classList.contains('hidden')) toggleMenu(); // Cerrar menú si está en móvil
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          window.history.pushState(null, '', href);
-        }
-      }
-    });
-  });
-</script>
