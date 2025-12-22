@@ -1,27 +1,57 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-import Hero from '../components/Hero.astro';
-import Admission_Process from '../components/Admision_Process.astro';
-import Coach from '../components/Coach_Index.astro';
-import Metod from '../components/Metod.astro';
-import Trainning from '../components/Trainning.astro';
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/index/NavBar.astro";
+import Hero from "../components/index/Hero.astro";
+import CoachIndex from "../components/index/Coach_Index.astro";
+import Metod from "../components/index/Metod.astro";
+import Trainning from "../components/index/Trainning.astro";
+import AdmisionProcess from "../components/index/Admision_Process.astro";
 ---
 
-<Layout title="HITRO | Defensa Personal Valencia">
+<Layout title="HITRO | High Performance">
+  <Navbar />
+  <main>
+    <section id="hero">
+      <Hero />
+    </section>
 
-    <Navbar />
+    <section id="metod">
+      <Metod />
+    </section>
 
-    <main>
+    <section id="admission">
+      <AdmisionProcess />
+    </section>
 
-        <Hero />
-        <Coach />
-        <Metod />
-        <Trainning />
-        <Admission_Process />
+    <section id="training">
+      <Trainning />
+    </section>
 
+    <section id="coach">
+      <CoachIndex />
+    </section>
 
-
-    </main>
-
+    <section id="contacto" class="py-24 px-4 bg-[#050505] border-t border-[#262626] relative overflow-hidden">
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <span class="text-blue-500 font-black uppercase tracking-widest text-sm">¿Listo para el siguiente nivel?</span>
+        <h2 class="text-4xl md:text-6xl font-display font-black text-white uppercase mt-4 mb-8 italic">Contacto Directo</h2>
+        <div class="bg-neutral-900 border border-white/10 p-8 rounded-[2rem]">
+          <p class="text-gray-400 font-sans text-lg mb-8">Si tienes dudas sobre el sistema de entrenamiento o la metodología, escríbenos.</p>
+          <a href="mailto:info@hitro.com" class="inline-flex items-center gap-3 bg-white text-black px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 hover:text-white transition-all duration-300 uppercase tracking-tighter">
+            Enviar Email
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
 </Layout>
+
+<style is:global>
+  html {
+    scroll-behavior: smooth;
+  }
+  /* Esto evita que el NavBar tape el título al hacer scroll */
+  section {
+    scroll-margin-top: 80px;
+  }
+</style>

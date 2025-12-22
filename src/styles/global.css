@@ -1,1 +1,10 @@
 @import "tailwindcss";
+/* src/styles/global.css */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Compensación por el Navbar Fixed (ajusta según la altura de tu nav) */
+section {
+  scroll-margin-top: 80px; 
+}
