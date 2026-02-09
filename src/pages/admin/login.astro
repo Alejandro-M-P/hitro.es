@@ -1,0 +1,65 @@
+---
+// src/pages/admin/login.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/index/NavBar.astro';
+---
+
+<Layout title="Admin Login | HITRO">
+  <Navbar />
+  <main class="pt-24 bg-brand-bg min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full bg-brand-card border border-brand-border rounded-[2rem] p-8 m-4">
+      <h1 class="text-3xl font-display font-black text-white uppercase text-center mb-6">Admin Access</h1>
+      <form id="login-form">
+        <div class="mb-4">
+          <label for="password" class="block text-brand-muted font-sans text-sm mb-2">Password</label>
+          <input type="password" id="password" name="password" class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue" />
+        </div>
+        <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider">
+          Login
+        </button>
+        <p id="error-message" class="text-red-500 text-sm mt-4 text-center"></p>
+      </form>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
+  if (!loginForm) {
+    console.warn('Login form not found.');
+  } else {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+      const errorMessage = document.getElementById('error-message') as HTMLElement;
+      const adminPassword = import.meta.env.PUBLIC_ADMIN_PASSWORD || '';
+      
+      // Clear previous error message
+      errorMessage.textContent = '';
+      console.log('Attempting to log in...');
+      if (!password || !password.trim()) {
+        errorMessage.textContent = 'Introduce la contrasena.';
+        return;
+      }
+
+      try {
+        if (!adminPassword) {
+          errorMessage.textContent = 'ADMIN no configurado.';
+          return;
+        }
+
+        if (password.trim() === adminPassword) {
+          localStorage.setItem('admin_session', 'admin');
+          window.location.href = '/admin';
+        } else {
+          errorMessage.textContent = 'Incorrect password.';
+          (form.elements.namedItem('password') as HTMLInputElement).value = '';
+        }
+      } catch (error) {
+        console.error('An error occurred during login:', error);
+        errorMessage.textContent = 'An unexpected error occurred. Please try again.';
+      }
+    });
+  }
+</script>

@@ -1,0 +1,192 @@
+---
+// src/pages/admin/products.astro
+import Layout from '../../layouts/Layout.astro';
+import { products } from '../../data/products';
+
+export const prerender = false;
+
+const session = Astro.cookies.get('session');
+const isDev = import.meta.env.DEV;
+
+if (!isDev && session?.value !== 'admin') {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<Layout title="Manage Products | HITRO">
+    <main class="py-12 bg-brand-bg min-h-screen">
+        <div class="max-w-4xl mx-auto px-4">
+            <a href="/admin" class="text-brand-muted hover:text-white inline-block mb-6">&larr; Back to Dashboard</a>
+            <h1 class="text-4xl font-display font-black text-white uppercase mb-8">Manage Products</h1>
+
+            <!-- Add Product Form -->
+            <form id="add-product-form" class="bg-brand-card border border-brand-border rounded-[2rem] p-8 mb-12">
+                <h2 class="text-2xl font-display font-bold text-white mb-6">Add New Product</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-brand-muted font-sans text-sm mb-2">Product Name</label>
+                        <input type="text" id="name" name="name" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div>
+                        <label for="price" class="block text-brand-muted font-sans text-sm mb-2">Price (e.g., 35.00€)</label>
+                        <input type="text" id="price" name="price" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div>
+                        <label for="category" class="block text-brand-muted font-sans text-sm mb-2">Category</label>
+                        <input type="text" id="category" name="category" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div>
+                        <label for="imageFile" class="block text-brand-muted font-sans text-sm mb-2">Imagen del producto (sube una imagen)</label>
+                        <input type="file" id="imageFile" name="imageFile" accept="image/*" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-brand-muted font-sans text-sm mb-2">Description</label>
+                        <textarea id="description" name="description" rows="4" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="mt-6 w-full md:w-auto bg-brand-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider">
+                    Add Product
+                </button>
+                <p id="form-message" class="text-sm mt-4"></p>
+            </form>
+
+            <!-- Existing Products List -->
+            <h2 class="text-2xl font-display font-bold text-white mb-6">Existing Products</h2>
+            <div id="product-list" class="grid grid-cols-1 gap-4">
+                {products.map(product => (
+                    <div class="bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4">
+                        <img src={product.imageUrl} alt={product.name} class="w-20 h-20 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <p class="text-white font-bold">{product.name}</p>
+                            <p class="text-brand-muted text-sm">{product.price}</p>
+                        </div>
+                        <button class="delete-dev hidden bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Eliminar</button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </main>
+</Layout>
+
+<script>
+    if (import.meta.env.DEV) {
+        const session = localStorage.getItem('admin_session');
+        if (session !== 'admin') {
+            window.location.href = '/admin/login';
+        }
+    }
+
+    const formEl = document.getElementById('add-product-form') as HTMLFormElement | null;
+    const listEl = document.getElementById('product-list');
+    const storageKey = 'hitro_products_dev';
+
+    function renderDevProducts() {
+        if (!listEl) return;
+        const devProducts = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        listEl.querySelectorAll('[data-dev-product]').forEach((el) => el.remove());
+
+        devProducts.forEach((product, index) => {
+            const item = document.createElement('div');
+            item.className = 'bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4';
+            item.setAttribute('data-dev-product', 'true');
+            item.innerHTML = `
+                <img src="${product.imageUrl || ''}" alt="${product.name || ''}" class="w-20 h-20 rounded-lg object-cover">
+                <div class="flex-1">
+                    <p class="text-white font-bold">${product.name || ''}</p>
+                    <p class="text-brand-muted text-sm">${product.price || ''}</p>
+                </div>
+                <button class="delete-dev bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index="${index}">Eliminar</button>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    if (import.meta.env.DEV) {
+        renderDevProducts();
+        listEl?.addEventListener('click', (e) => {
+            const btn = (e.target as HTMLElement).closest('.delete-dev') as HTMLElement | null;
+            if (!btn) return;
+            const index = Number.parseInt(btn.getAttribute('data-index') || '-1', 10);
+            if (index < 0) return;
+            const devProducts = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            devProducts.splice(index, 1);
+            localStorage.setItem(storageKey, JSON.stringify(devProducts));
+            renderDevProducts();
+        });
+    }
+
+    if (formEl) {
+        formEl.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target as HTMLFormElement;
+            const formData = new FormData(form);
+            const messageEl = document.getElementById('form-message');
+
+            if (!messageEl) {
+                console.error('Could not find form-message element');
+                return;
+            }
+
+            const params = new URLSearchParams();
+            formData.forEach((value, key) => {
+                params.append(key, String(value));
+            });
+
+            if (import.meta.env.DEV) {
+                const file = formData.get('imageFile') as File | null;
+                if (!file) {
+                    messageEl.textContent = 'Selecciona una imagen.';
+                    messageEl.className = 'text-red-500 text-sm mt-4';
+                    return;
+                }
+
+                const payload = Object.fromEntries(params.entries()) as Record<string, string>;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const imageUrl = String(reader.result || '');
+                    const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    existing.push({
+                        ...payload,
+                        imageUrl,
+                    });
+                    localStorage.setItem(storageKey, JSON.stringify(existing));
+
+                    messageEl.textContent = 'Producto guardado en modo DEV.';
+                    messageEl.className = 'text-green-500 text-sm mt-4';
+                    form.reset();
+                    renderDevProducts();
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params.toString()
+            });
+
+            if (response.ok) {
+                messageEl.textContent = 'Product added successfully! Refreshing...';
+                messageEl.className = 'text-green-500 text-sm mt-4';
+                form.reset();
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                const text = await response.text();
+                if (text) {
+                    try {
+                        const data = JSON.parse(text);
+                        messageEl.textContent = data.message || text;
+                    } catch {
+                        messageEl.textContent = text;
+                    }
+                } else {
+                    messageEl.textContent = 'Error adding product.';
+                }
+                messageEl.className = 'text-red-500 text-sm mt-4';
+            }
+        });
+    }
+</script>

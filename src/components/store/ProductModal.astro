@@ -1,0 +1,127 @@
+---
+// src/components/store/ProductModal.astro
+import { X } from 'lucide-astro';
+
+// This component will be controlled by client-side script
+---
+<div id="product-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+  <div id="modal-content" class="bg-brand-card border border-brand-border rounded-[2rem] max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 p-8 relative animate-fade-in">
+    <button id="close-modal" class="absolute top-4 right-4 text-brand-muted hover:text-white transition-colors">
+      <X class="w-6 h-6" />
+    </button>
+    
+    <div>
+      <img id="modal-image" src="" alt="" class="w-full h-auto object-cover rounded-2xl">
+    </div>
+
+    <div class="flex flex-col justify-center">
+      <h2 id="modal-name" class="text-3xl font-display font-black text-white uppercase"></h2>
+      <p id="modal-price" class="text-brand-blue text-4xl font-black font-sans my-4"></p>
+      <p id="modal-description" class="text-brand-muted font-sans text-base leading-relaxed mb-6">
+        Aquí va una descripción detallada del producto, explicando sus características, materiales y beneficios.
+      </p>
+
+      <div class="bg-black/20 rounded-2xl p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <p class="text-white font-bold uppercase tracking-wider text-xs">Valoraciones</p>
+          <span id="modal-rating-value" class="text-brand-muted text-xs">Tu valoracion: 0/5</span>
+        </div>
+        <div class="mt-3 flex items-center gap-2" id="rating-stars">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <button class="rating-star w-9 h-9 rounded-full bg-black/30 text-brand-muted hover:text-white hover:bg-brand-blue/40 transition-all duration-200" data-rating={i + 1}>
+              ★
+            </button>
+          ))}
+        </div>
+        <div class="mt-3">
+          <textarea id="rating-note" rows="2" class="w-full bg-black/30 border border-brand-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-blue" placeholder="Comparte tu experiencia..."></textarea>
+          <button id="rating-submit" class="mt-2 w-full bg-white text-black font-bold uppercase tracking-wider text-xs py-2 rounded-xl hover:bg-brand-blue hover:text-white transition-all duration-300">
+            Enviar valoracion
+          </button>
+        </div>
+      </div>
+
+      <button id="modal-add-to-cart" class="w-full inline-flex items-center justify-center gap-2 bg-brand-blue text-white px-6 py-4 rounded-xl font-bold hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider">
+        Añadir al carrito
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const initProductModal = () => {
+    const modal = document.getElementById('product-modal') as HTMLElement;
+    const closeModalBtn = document.getElementById('close-modal') as HTMLButtonElement;
+    const modalContent = document.getElementById('modal-content') as HTMLElement;
+    const ratingStars = document.querySelectorAll('.rating-star');
+    const ratingValue = document.getElementById('modal-rating-value') as HTMLElement;
+    const ratingSubmit = document.getElementById('rating-submit') as HTMLButtonElement;
+    const addToCartBtn = document.getElementById('modal-add-to-cart') as HTMLButtonElement;
+    const ratingNote = document.getElementById('rating-note') as HTMLTextAreaElement;
+
+    let currentRating = 0;
+    
+    function closeModal() {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function updateStars(value: number) {
+      ratingStars.forEach((star, index) => {
+        const active = index < value;
+        star.classList.toggle('bg-brand-blue', active);
+        star.classList.toggle('text-white', active);
+        star.classList.toggle('bg-black/30', !active);
+        star.classList.toggle('text-brand-muted', !active);
+      });
+      ratingValue.textContent = `Tu valoracion: ${value}/5`;
+    }
+
+    window.addEventListener('modal:open', () => {
+      currentRating = 0;
+      ratingNote.value = '';
+      updateStars(0);
+    });
+
+    ratingStars.forEach((star) => {
+      star.addEventListener('click', () => {
+        const value = Number.parseInt((star as HTMLElement).dataset.rating || '0', 10);
+        currentRating = value;
+        updateStars(value);
+      });
+    });
+
+    ratingSubmit.addEventListener('click', () => {
+      ratingNote.value = '';
+      currentRating = 0;
+      updateStars(0);
+    });
+
+    addToCartBtn.addEventListener('click', () => {
+      const detail = {
+        name: modal.getAttribute('data-name') || '',
+        price: modal.getAttribute('data-price') || '',
+        image: modal.getAttribute('data-image') || '',
+      };
+      window.dispatchEvent(new CustomEvent('cart:add', { detail }));
+      closeModal();
+    });
+
+    closeModalBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeModal();
+    });
+    modalContent?.addEventListener('click', (e) => e.stopPropagation());
+    modal.addEventListener('click', () => closeModal());
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") {
+            closeModal();
+        }
+    });
+  };
+
+  document.addEventListener('astro:page-load', initProductModal);
+  document.addEventListener('DOMContentLoaded', initProductModal);
+</script>

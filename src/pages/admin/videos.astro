@@ -1,0 +1,177 @@
+---
+// src/pages/admin/videos.astro
+import Layout from '../../layouts/Layout.astro';
+import { lessons } from '../../data/lessons';
+
+export const prerender = false;
+
+const session = Astro.cookies.get('session');
+const isDev = import.meta.env.DEV;
+
+if (!isDev && session?.value !== 'admin') {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<Layout title="Manage Videos | HITRO">
+    <main class="py-12 bg-brand-bg min-h-screen">
+        <div class="max-w-4xl mx-auto px-4">
+            <a href="/admin" class="text-brand-muted hover:text-white inline-block mb-6">&larr; Back to Dashboard</a>
+            <h1 class="text-4xl font-display font-black text-white uppercase mb-8">Manage Videos</h1>
+
+            <!-- Add Video Form -->
+            <form id="add-video-form" class="bg-brand-card border border-brand-border rounded-[2rem] p-8 mb-12">
+                <h2 class="text-2xl font-display font-bold text-white mb-6">Add New Video</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="title" class="block text-brand-muted font-sans text-sm mb-2">Video Title</label>
+                        <input type="text" id="title" name="title" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div>
+                        <label for="category" class="block text-brand-muted font-sans text-sm mb-2">Category</label>
+                        <input type="text" id="category" name="category" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div>
+                        <label for="youtubeId" class="block text-brand-muted font-sans text-sm mb-2">YouTube Video ID</label>
+                        <input type="text" id="youtubeId" name="youtubeId" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div>
+                        <label for="duration" class="block text-brand-muted font-sans text-sm mb-2">Duration (e.g., 12:45)</label>
+                        <input type="text" id="duration" name="duration" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="thumbnail" class="block text-brand-muted font-sans text-sm mb-2">Thumbnail Image (sube una imagen)</label>
+                        <input type="file" id="thumbnail" name="thumbnail" accept="image/*" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-brand-muted font-sans text-sm mb-2">Description</label>
+                        <textarea id="description" name="description" rows="4" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="mt-6 w-full md:w-auto bg-brand-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider">
+                    Add Video
+                </button>
+                <p id="form-message" class="text-sm mt-4"></p>
+            </form>
+
+            <!-- Existing Videos List -->
+            <h2 class="text-2xl font-display font-bold text-white mb-6">Existing Videos</h2>
+            <div id="video-list" class="grid grid-cols-1 gap-4">
+                {lessons.map(lesson => (
+                    <div class="bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4">
+                        <img src={lesson.imageUrl} alt={lesson.title} class="w-20 h-20 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <p class="text-white font-bold">{lesson.title}</p>
+                            <p class="text-brand-muted text-sm">{lesson.category}</p>
+                        </div>
+                        <button class="delete-dev hidden bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Eliminar</button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </main>
+</Layout>
+
+<script>
+    if (import.meta.env.DEV) {
+        const session = localStorage.getItem('admin_session');
+        if (session !== 'admin') {
+            window.location.href = '/admin/login';
+        }
+    }
+
+    const formEl = document.getElementById('add-video-form') as HTMLFormElement | null;
+    const listEl = document.getElementById('video-list');
+    const storageKey = 'hitro_videos_dev';
+
+    function renderDevVideos() {
+        if (!listEl) return;
+        const devVideos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        listEl.querySelectorAll('[data-dev-video]').forEach((el) => el.remove());
+
+        devVideos.forEach((video, index) => {
+            const item = document.createElement('div');
+            item.className = 'bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4';
+            item.setAttribute('data-dev-video', 'true');
+            item.innerHTML = `
+                <img src="${video.imageUrl || ''}" alt="${video.title || ''}" class="w-20 h-20 rounded-lg object-cover">
+                <div class="flex-1">
+                    <p class="text-white font-bold">${video.title || ''}</p>
+                    <p class="text-brand-muted text-sm">${video.category || ''}</p>
+                </div>
+                <button class="delete-dev bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index="${index}">Eliminar</button>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    if (import.meta.env.DEV) {
+        renderDevVideos();
+        listEl?.addEventListener('click', (e) => {
+            const btn = (e.target as HTMLElement).closest('.delete-dev') as HTMLElement | null;
+            if (!btn) return;
+            const index = Number.parseInt(btn.getAttribute('data-index') || '-1', 10);
+            if (index < 0) return;
+            const devVideos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            devVideos.splice(index, 1);
+            localStorage.setItem(storageKey, JSON.stringify(devVideos));
+            renderDevVideos();
+        });
+    }
+
+    formEl?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        const messageEl = document.getElementById('form-message');
+
+        const params = new URLSearchParams();
+        formData.forEach((value, key) => {
+            params.append(key, String(value));
+        });
+
+        if (import.meta.env.DEV) {
+            const file = formData.get('thumbnail') as File | null;
+            if (!file) {
+                messageEl.textContent = 'Selecciona una imagen.';
+                messageEl.className = 'text-red-500 text-sm mt-4';
+                return;
+            }
+
+            const payload = Object.fromEntries(params.entries()) as Record<string, string>;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const imageUrl = String(reader.result || '');
+                const devVideos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                devVideos.push({
+                    ...payload,
+                    imageUrl,
+                });
+                localStorage.setItem(storageKey, JSON.stringify(devVideos));
+
+                messageEl.textContent = 'Video guardado en modo DEV.';
+                messageEl.className = 'text-green-500 text-sm mt-4';
+                form.reset();
+                renderDevVideos();
+            };
+            reader.readAsDataURL(file);
+
+            return;
+        }
+
+        const response = await fetch('/api/videos', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            messageEl.textContent = 'Video added successfully! Refreshing...';
+            messageEl.className = 'text-green-500 text-sm mt-4';
+            form.reset();
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            messageEl.textContent = 'Error adding video.';
+            messageEl.className = 'text-red-500 text-sm mt-4';
+        }
+    });
+</script>

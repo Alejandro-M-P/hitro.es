@@ -1,0 +1,62 @@
+---
+// src/pages/admin/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/index/NavBar.astro';
+
+export const prerender = false;
+
+const session = Astro.cookies.get('session');
+const isDev = import.meta.env.DEV;
+
+if (!isDev && session?.value !== 'admin') {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<Layout title="Admin Dashboard | HITRO">
+  <Navbar />
+  <main class="pt-24 bg-brand-bg min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-display font-black text-white uppercase">Admin Dashboard</h1>
+        <button id="logout-btn" class="bg-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-300 uppercase tracking-wider text-sm">
+          Logout
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Manage Products -->
+        <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Manage Products</h2>
+          <p class="text-brand-muted mb-6">Add, edit, or delete products from the store.</p>
+          <a href="/admin/products" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
+            Manage Products
+          </a>
+        </div>
+
+        <!-- Manage Videos -->
+        <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Manage Videos</h2>
+          <p class="text-brand-muted mb-6">Add, edit, or delete videos from the virtual classroom.</p>
+           <a href="/admin/videos" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
+            Manage Videos
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  if (import.meta.env.DEV) {
+    const session = localStorage.getItem('admin_session');
+    if (session !== 'admin') {
+      window.location.href = '/admin/login';
+    }
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
+  });
+</script>

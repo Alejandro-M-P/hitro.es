@@ -28,7 +28,9 @@ const { title, description = "HITRO - Defensa Personal" } = Astro.props;
 	<body class="bg-brand-bg text-brand-text antialiased selection:bg-brand-blue selection:text-white">
 		<slot />
         <script is:inline>
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+              window.lucide.createIcons();
+            }
         </script>
 	</body>
 </html>

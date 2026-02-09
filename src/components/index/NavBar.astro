@@ -9,8 +9,10 @@ const scrollLinks = [
 
 const externalLinks = [
   { name: 'Aula Virtual', href: '/AulaVirtual', style: 'text-blue-500 hover:text-white' },
-  { name: 'TIENDA', href: '/Store', style: 'bg-white text-black px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white' }
+  { name: 'TIENDA', href: '/store', style: 'bg-white text-black px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white' }
 ];
+
+const isDev = Astro.url.hostname === 'localhost';
 ---
 
 <nav class="fixed top-4 w-full z-50 px-4 flex flex-col items-center">
@@ -32,6 +34,9 @@ const externalLinks = [
     </div>
 
     <div class="flex items-center gap-4">
+      {isDev && (
+        <a href="/admin/login" class="text-xs text-yellow-400 hover:text-white">Admin</a>
+      )}
       <a href={externalLinks[1].href} class={`${externalLinks[1].style} text-[10px] font-black transition-all uppercase tracking-widest`}>
         {externalLinks[1].name}
       </a>
