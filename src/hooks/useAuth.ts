@@ -1,34 +1,33 @@
-interface AuthModel {
-  isDevAuthenticated(): boolean;
-  login(password: string, expectedPassword: string): { ok: boolean; message?: string };
-  logout(): void;
-}
-
+// src/hooks/useAuth.ts
 const SESSION_KEY = 'admin_session';
 
-class AuthState implements AuthModel {
-  isDevAuthenticated(): boolean {
-    return window.localStorage.getItem(SESSION_KEY) === 'admin';
-  }
+export function useAuth() {
+  return {
+    isDevAuthenticated: () => {
+      // En producción, esto debería verificar la cookie, 
+      // pero para tus pruebas mantenemos el localStorage
+      return typeof window !== 'undefined' && window.localStorage.getItem(SESSION_KEY) === 'admin';
+    },
 
-  login(password: string, expectedPassword: string): { ok: boolean; message?: string } {
-    if (!expectedPassword) {
-      return { ok: false, message: 'ADMIN no configurado.' };
+    login: async (password: string) => {
+      // LLAMADA REAL A TU API
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+
+      if (response.ok) {
+        window.localStorage.setItem(SESSION_KEY, 'admin');
+        return { ok: true };
+      }
+      
+      return { ok: false, message: 'Credenciales inválidas' };
+    },
+
+    logout: () => {
+      window.localStorage.removeItem(SESSION_KEY);
+      fetch('/api/logout', { method: 'POST' }); // Avisa al servidor
     }
-
-    if (password.trim() !== expectedPassword.trim()) {
-      return { ok: false, message: 'Contrasena incorrecta.' };
-    }
-
-    window.localStorage.setItem(SESSION_KEY, 'admin');
-    return { ok: true };
-  }
-
-  logout(): void {
-    window.localStorage.removeItem(SESSION_KEY);
-  }
-}
-
-export function useAuth(): AuthModel {
-  return new AuthState();
+  };
 }
