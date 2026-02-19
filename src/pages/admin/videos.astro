@@ -19,7 +19,6 @@ if (!isDev && session?.value !== 'admin') {
             <a href="/admin" class="text-brand-muted hover:text-white inline-block mb-6">&larr; Back to Dashboard</a>
             <h1 class="text-4xl font-display font-black text-white uppercase mb-8">Manage Videos</h1>
 
-            <!-- Add Video Form -->
             <form id="add-video-form" class="bg-brand-card border border-brand-border rounded-[2rem] p-8 mb-12">
                 <h2 class="text-2xl font-display font-bold text-white mb-6">Add New Video</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -40,8 +39,8 @@ if (!isDev && session?.value !== 'admin') {
                         <input type="text" id="duration" name="duration" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
                     </div>
                     <div class="md:col-span-2">
-                        <label for="thumbnail" class="block text-brand-muted font-sans text-sm mb-2">Thumbnail Image (sube una imagen)</label>
-                        <input type="file" id="thumbnail" name="thumbnail" accept="image/*" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                        <label for="imageUrl" class="block text-brand-muted font-sans text-sm mb-2">Thumbnail Image URL</label>
+                        <input type="url" id="imageUrl" name="imageUrl" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
                     </div>
                     <div class="md:col-span-2">
                         <label for="description" class="block text-brand-muted font-sans text-sm mb-2">Description</label>
@@ -54,24 +53,71 @@ if (!isDev && session?.value !== 'admin') {
                 <p id="form-message" class="text-sm mt-4"></p>
             </form>
 
-            <!-- Existing Videos List -->
             <h2 class="text-2xl font-display font-bold text-white mb-6">Existing Videos</h2>
             <div id="video-list" class="grid grid-cols-1 gap-4">
-                {lessons.map(lesson => (
+                {lessons.map((lesson, index) => (
                     <div class="bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4">
                         <img src={lesson.imageUrl} alt={lesson.title} class="w-20 h-20 rounded-lg object-cover">
                         <div class="flex-1">
                             <p class="text-white font-bold">{lesson.title}</p>
                             <p class="text-brand-muted text-sm">{lesson.category}</p>
                         </div>
-                        <button class="delete-dev hidden bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Eliminar</button>
+                        <div class="flex items-center gap-2">
+                            <button class="edit-btn bg-yellow-500 text-white text-xs font-bold px-3 py-2 rounded-lg" data-source="base" data-index={index}>Editar</button>
+                            <button class="delete-dev hidden bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Eliminar</button>
+                        </div>
                     </div>
                 ))}
             </div>
         </div>
     </main>
+
+    <div id="edit-video-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70">
+        <div class="w-full max-w-3xl bg-brand-card border border-brand-border rounded-2xl p-6 md:p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-display font-bold text-white">Editar video</h2>
+                <button id="close-edit-video-modal" type="button" class="text-brand-muted hover:text-white text-xl">&times;</button>
+            </div>
+
+            <form id="edit-video-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-title" class="block text-brand-muted font-sans text-sm mb-2">Video Title</label>
+                        <input id="edit-title" name="title" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div>
+                        <label for="edit-category" class="block text-brand-muted font-sans text-sm mb-2">Category</label>
+                        <input id="edit-category" name="category" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div>
+                        <label for="edit-youtube" class="block text-brand-muted font-sans text-sm mb-2">YouTube Video ID</label>
+                        <input id="edit-youtube" name="youtubeId" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div>
+                        <label for="edit-duration" class="block text-brand-muted font-sans text-sm mb-2">Duration</label>
+                        <input id="edit-duration" name="duration" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="edit-image-url" class="block text-brand-muted font-sans text-sm mb-2">Thumbnail URL</label>
+                        <input id="edit-image-url" name="imageUrl" type="url" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="edit-description" class="block text-brand-muted font-sans text-sm mb-2">Description</label>
+                        <textarea id="edit-description" name="description" rows="4" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-3 pt-2">
+                    <button id="save-edit-video" type="submit" class="bg-brand-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-600 uppercase tracking-wider">Guardar cambios</button>
+                    <button id="cancel-edit-video" type="button" class="bg-brand-border text-white font-bold py-3 px-8 rounded-lg hover:bg-neutral-700 uppercase tracking-wider">Cancelar</button>
+                </div>
+                <p id="edit-form-message" class="text-sm"></p>
+            </form>
+        </div>
+    </div>
 </Layout>
 
+<script id="base-videos-data" type="application/json" set:html={JSON.stringify(lessons)}></script>
 <script>
     if (import.meta.env.DEV) {
         const session = localStorage.getItem('admin_session');
@@ -80,13 +126,57 @@ if (!isDev && session?.value !== 'admin') {
         }
     }
 
-    const formEl = document.getElementById('add-video-form') as HTMLFormElement | null;
+    const addFormEl = document.getElementById('add-video-form') as HTMLFormElement | null;
     const listEl = document.getElementById('video-list');
+    const messageEl = document.getElementById('form-message');
     const storageKey = 'hitro_videos_dev';
+    const baseVideos = JSON.parse(document.getElementById('base-videos-data')?.textContent || '[]');
+
+    const editModalEl = document.getElementById('edit-video-modal');
+    const editFormEl = document.getElementById('edit-video-form') as HTMLFormElement | null;
+    const editMessageEl = document.getElementById('edit-form-message');
+
+    type VideoPayload = {
+        title: string;
+        category: string;
+        youtubeId: string;
+        duration: string;
+        imageUrl: string;
+        description: string;
+    };
+
+    type EditSource = 'base' | 'dev';
+    let editing: { source: EditSource; index: number } | null = null;
+
+    function getDevVideos(): VideoPayload[] {
+        return JSON.parse(localStorage.getItem(storageKey) || '[]');
+    }
+
+    function openEditModal(item: VideoPayload, source: EditSource, index: number) {
+        if (!editFormEl || !editModalEl) return;
+        editing = { source, index };
+        (editFormEl.elements.namedItem('title') as HTMLInputElement).value = item.title || '';
+        (editFormEl.elements.namedItem('category') as HTMLInputElement).value = item.category || '';
+        (editFormEl.elements.namedItem('youtubeId') as HTMLInputElement).value = item.youtubeId || '';
+        (editFormEl.elements.namedItem('duration') as HTMLInputElement).value = item.duration || '';
+        (editFormEl.elements.namedItem('imageUrl') as HTMLInputElement).value = item.imageUrl || '';
+        (editFormEl.elements.namedItem('description') as HTMLTextAreaElement).value = item.description || '';
+        if (editMessageEl) editMessageEl.textContent = '';
+        editModalEl.classList.remove('hidden');
+        editModalEl.classList.add('flex');
+    }
+
+    function closeEditModal() {
+        if (!editModalEl || !editFormEl) return;
+        editing = null;
+        editFormEl.reset();
+        editModalEl.classList.add('hidden');
+        editModalEl.classList.remove('flex');
+    }
 
     function renderDevVideos() {
         if (!listEl) return;
-        const devVideos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const devVideos = getDevVideos();
         listEl.querySelectorAll('[data-dev-video]').forEach((el) => el.remove());
 
         devVideos.forEach((video, index) => {
@@ -99,7 +189,10 @@ if (!isDev && session?.value !== 'admin') {
                     <p class="text-white font-bold">${video.title || ''}</p>
                     <p class="text-brand-muted text-sm">${video.category || ''}</p>
                 </div>
-                <button class="delete-dev bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index="${index}">Eliminar</button>
+                <div class="flex items-center gap-2">
+                    <button class="edit-btn bg-yellow-500 text-white text-xs font-bold px-3 py-2 rounded-lg" data-source="dev" data-index="${index}">Editar</button>
+                    <button class="delete-dev bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index="${index}">Eliminar</button>
+                </div>
             `;
             listEl.appendChild(item);
         });
@@ -107,61 +200,57 @@ if (!isDev && session?.value !== 'admin') {
 
     if (import.meta.env.DEV) {
         renderDevVideos();
-        listEl?.addEventListener('click', (e) => {
-            const btn = (e.target as HTMLElement).closest('.delete-dev') as HTMLElement | null;
-            if (!btn) return;
-            const index = Number.parseInt(btn.getAttribute('data-index') || '-1', 10);
+    }
+
+    listEl?.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+
+        const deleteBtn = target.closest('.delete-dev') as HTMLElement | null;
+        if (deleteBtn && import.meta.env.DEV) {
+            const index = Number.parseInt(deleteBtn.getAttribute('data-index') || '-1', 10);
             if (index < 0) return;
-            const devVideos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const devVideos = getDevVideos();
             devVideos.splice(index, 1);
             localStorage.setItem(storageKey, JSON.stringify(devVideos));
             renderDevVideos();
-        });
-    }
+            return;
+        }
 
-    formEl?.addEventListener('submit', async (e) => {
+        const editBtn = target.closest('.edit-btn') as HTMLElement | null;
+        if (!editBtn) return;
+
+        const index = Number.parseInt(editBtn.getAttribute('data-index') || '-1', 10);
+        const source = (editBtn.getAttribute('data-source') || 'base') as EditSource;
+        if (index < 0) return;
+
+        const current = source === 'dev' ? getDevVideos()[index] : baseVideos[index];
+        if (!current) return;
+        openEditModal(current, source, index);
+    });
+
+    addFormEl?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.target as HTMLFormElement;
         const formData = new FormData(form);
-        const messageEl = document.getElementById('form-message');
+        if (!messageEl) return;
 
-        const params = new URLSearchParams();
-        formData.forEach((value, key) => {
-            params.append(key, String(value));
-        });
+        const payload = Object.fromEntries(Array.from(formData.entries()).map(([k, v]) => [k, String(v)])) as VideoPayload;
 
         if (import.meta.env.DEV) {
-            const file = formData.get('thumbnail') as File | null;
-            if (!file) {
-                messageEl.textContent = 'Selecciona una imagen.';
-                messageEl.className = 'text-red-500 text-sm mt-4';
-                return;
-            }
-
-            const payload = Object.fromEntries(params.entries()) as Record<string, string>;
-            const reader = new FileReader();
-            reader.onload = () => {
-                const imageUrl = String(reader.result || '');
-                const devVideos = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                devVideos.push({
-                    ...payload,
-                    imageUrl,
-                });
-                localStorage.setItem(storageKey, JSON.stringify(devVideos));
-
-                messageEl.textContent = 'Video guardado en modo DEV.';
-                messageEl.className = 'text-green-500 text-sm mt-4';
-                form.reset();
-                renderDevVideos();
-            };
-            reader.readAsDataURL(file);
-
+            const existing = getDevVideos();
+            existing.push(payload);
+            localStorage.setItem(storageKey, JSON.stringify(existing));
+            messageEl.textContent = 'Video guardado en modo DEV.';
+            messageEl.className = 'text-green-500 text-sm mt-4';
+            form.reset();
+            renderDevVideos();
             return;
         }
 
         const response = await fetch('/api/videos', {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(payload).toString(),
         });
 
         if (response.ok) {
@@ -170,8 +259,56 @@ if (!isDev && session?.value !== 'admin') {
             form.reset();
             setTimeout(() => window.location.reload(), 2000);
         } else {
-            messageEl.textContent = 'Error adding video.';
+            const text = await response.text();
+            messageEl.textContent = text || 'Error adding video.';
             messageEl.className = 'text-red-500 text-sm mt-4';
         }
+    });
+
+    editFormEl?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!editing || !editMessageEl) return;
+
+        const formData = new FormData(editFormEl);
+        const payload = Object.fromEntries(Array.from(formData.entries()).map(([k, v]) => [k, String(v)])) as VideoPayload;
+
+        if (import.meta.env.DEV && editing.source === 'dev') {
+            const existing = getDevVideos();
+            if (!existing[editing.index]) {
+                editMessageEl.textContent = 'No se encontro el video a editar.';
+                editMessageEl.className = 'text-red-500 text-sm';
+                return;
+            }
+            existing[editing.index] = payload;
+            localStorage.setItem(storageKey, JSON.stringify(existing));
+            editMessageEl.textContent = 'Video actualizado en modo DEV.';
+            editMessageEl.className = 'text-green-500 text-sm';
+            renderDevVideos();
+            setTimeout(closeEditModal, 500);
+            return;
+        }
+
+        const response = await fetch('/api/videos', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ index: editing.index, ...payload }),
+        });
+
+        if (response.ok) {
+            editMessageEl.textContent = 'Video actualizado. Recargando...';
+            editMessageEl.className = 'text-green-500 text-sm';
+            setTimeout(() => window.location.reload(), 1200);
+        } else {
+            const text = await response.text();
+            editMessageEl.textContent = text || 'Error al actualizar video.';
+            editMessageEl.className = 'text-red-500 text-sm';
+        }
+    });
+
+    document.getElementById('close-edit-video-modal')?.addEventListener('click', closeEditModal);
+    document.getElementById('cancel-edit-video')?.addEventListener('click', closeEditModal);
+
+    editModalEl?.addEventListener('click', (e) => {
+        if (e.target === editModalEl) closeEditModal();
     });
 </script>

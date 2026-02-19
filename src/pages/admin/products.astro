@@ -19,7 +19,6 @@ if (!isDev && session?.value !== 'admin') {
             <a href="/admin" class="text-brand-muted hover:text-white inline-block mb-6">&larr; Back to Dashboard</a>
             <h1 class="text-4xl font-display font-black text-white uppercase mb-8">Manage Products</h1>
 
-            <!-- Add Product Form -->
             <form id="add-product-form" class="bg-brand-card border border-brand-border rounded-[2rem] p-8 mb-12">
                 <h2 class="text-2xl font-display font-bold text-white mb-6">Add New Product</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -36,8 +35,8 @@ if (!isDev && session?.value !== 'admin') {
                         <input type="text" id="category" name="category" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
                     </div>
                     <div>
-                        <label for="imageFile" class="block text-brand-muted font-sans text-sm mb-2">Imagen del producto (sube una imagen)</label>
-                        <input type="file" id="imageFile" name="imageFile" accept="image/*" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                        <label for="imageUrl" class="block text-brand-muted font-sans text-sm mb-2">Image URL</label>
+                        <input type="url" id="imageUrl" name="imageUrl" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
                     </div>
                     <div class="md:col-span-2">
                         <label for="description" class="block text-brand-muted font-sans text-sm mb-2">Description</label>
@@ -50,24 +49,67 @@ if (!isDev && session?.value !== 'admin') {
                 <p id="form-message" class="text-sm mt-4"></p>
             </form>
 
-            <!-- Existing Products List -->
             <h2 class="text-2xl font-display font-bold text-white mb-6">Existing Products</h2>
             <div id="product-list" class="grid grid-cols-1 gap-4">
-                {products.map(product => (
+                {products.map((product, index) => (
                     <div class="bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4">
                         <img src={product.imageUrl} alt={product.name} class="w-20 h-20 rounded-lg object-cover">
                         <div class="flex-1">
                             <p class="text-white font-bold">{product.name}</p>
                             <p class="text-brand-muted text-sm">{product.price}</p>
                         </div>
-                        <button class="delete-dev hidden bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Eliminar</button>
+                        <div class="flex items-center gap-2">
+                            <button class="edit-btn bg-yellow-500 text-white text-xs font-bold px-3 py-2 rounded-lg" data-source="base" data-index={index}>Editar</button>
+                            <button class="delete-dev hidden bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Eliminar</button>
+                        </div>
                     </div>
                 ))}
             </div>
         </div>
     </main>
+
+    <div id="edit-product-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70">
+        <div class="w-full max-w-3xl bg-brand-card border border-brand-border rounded-2xl p-6 md:p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-display font-bold text-white">Editar producto</h2>
+                <button id="close-edit-product-modal" type="button" class="text-brand-muted hover:text-white text-xl">&times;</button>
+            </div>
+
+            <form id="edit-product-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-name" class="block text-brand-muted font-sans text-sm mb-2">Product Name</label>
+                        <input id="edit-name" name="name" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div>
+                        <label for="edit-price" class="block text-brand-muted font-sans text-sm mb-2">Price</label>
+                        <input id="edit-price" name="price" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div>
+                        <label for="edit-category" class="block text-brand-muted font-sans text-sm mb-2">Category</label>
+                        <input id="edit-category" name="category" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div>
+                        <label for="edit-image-url" class="block text-brand-muted font-sans text-sm mb-2">Image URL</label>
+                        <input id="edit-image-url" name="imageUrl" type="url" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="edit-description" class="block text-brand-muted font-sans text-sm mb-2">Description</label>
+                        <textarea id="edit-description" name="description" rows="4" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-3 pt-2">
+                    <button id="save-edit-product" type="submit" class="bg-brand-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-600 uppercase tracking-wider">Guardar cambios</button>
+                    <button id="cancel-edit-product" type="button" class="bg-brand-border text-white font-bold py-3 px-8 rounded-lg hover:bg-neutral-700 uppercase tracking-wider">Cancelar</button>
+                </div>
+                <p id="edit-form-message" class="text-sm"></p>
+            </form>
+        </div>
+    </div>
 </Layout>
 
+<script id="base-products-data" type="application/json" set:html={JSON.stringify(products)}></script>
 <script>
     if (import.meta.env.DEV) {
         const session = localStorage.getItem('admin_session');
@@ -76,13 +118,55 @@ if (!isDev && session?.value !== 'admin') {
         }
     }
 
-    const formEl = document.getElementById('add-product-form') as HTMLFormElement | null;
+    const addFormEl = document.getElementById('add-product-form') as HTMLFormElement | null;
     const listEl = document.getElementById('product-list');
+    const messageEl = document.getElementById('form-message');
     const storageKey = 'hitro_products_dev';
+    const baseProducts = JSON.parse(document.getElementById('base-products-data')?.textContent || '[]');
+
+    const editModalEl = document.getElementById('edit-product-modal');
+    const editFormEl = document.getElementById('edit-product-form') as HTMLFormElement | null;
+    const editMessageEl = document.getElementById('edit-form-message');
+
+    type ProductPayload = {
+        name: string;
+        price: string;
+        category: string;
+        imageUrl: string;
+        description: string;
+    };
+
+    type EditSource = 'base' | 'dev';
+    let editing: { source: EditSource; index: number } | null = null;
+
+    function getDevProducts(): ProductPayload[] {
+        return JSON.parse(localStorage.getItem(storageKey) || '[]');
+    }
+
+    function openEditModal(item: ProductPayload, source: EditSource, index: number) {
+        if (!editFormEl || !editModalEl) return;
+        editing = { source, index };
+        (editFormEl.elements.namedItem('name') as HTMLInputElement).value = item.name || '';
+        (editFormEl.elements.namedItem('price') as HTMLInputElement).value = item.price || '';
+        (editFormEl.elements.namedItem('category') as HTMLInputElement).value = item.category || '';
+        (editFormEl.elements.namedItem('imageUrl') as HTMLInputElement).value = item.imageUrl || '';
+        (editFormEl.elements.namedItem('description') as HTMLTextAreaElement).value = item.description || '';
+        if (editMessageEl) editMessageEl.textContent = '';
+        editModalEl.classList.remove('hidden');
+        editModalEl.classList.add('flex');
+    }
+
+    function closeEditModal() {
+        if (!editModalEl || !editFormEl) return;
+        editing = null;
+        editFormEl.reset();
+        editModalEl.classList.add('hidden');
+        editModalEl.classList.remove('flex');
+    }
 
     function renderDevProducts() {
         if (!listEl) return;
-        const devProducts = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const devProducts = getDevProducts();
         listEl.querySelectorAll('[data-dev-product]').forEach((el) => el.remove());
 
         devProducts.forEach((product, index) => {
@@ -95,7 +179,10 @@ if (!isDev && session?.value !== 'admin') {
                     <p class="text-white font-bold">${product.name || ''}</p>
                     <p class="text-brand-muted text-sm">${product.price || ''}</p>
                 </div>
-                <button class="delete-dev bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index="${index}">Eliminar</button>
+                <div class="flex items-center gap-2">
+                    <button class="edit-btn bg-yellow-500 text-white text-xs font-bold px-3 py-2 rounded-lg" data-source="dev" data-index="${index}">Editar</button>
+                    <button class="delete-dev bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index="${index}">Eliminar</button>
+                </div>
             `;
             listEl.appendChild(item);
         });
@@ -103,90 +190,115 @@ if (!isDev && session?.value !== 'admin') {
 
     if (import.meta.env.DEV) {
         renderDevProducts();
-        listEl?.addEventListener('click', (e) => {
-            const btn = (e.target as HTMLElement).closest('.delete-dev') as HTMLElement | null;
-            if (!btn) return;
-            const index = Number.parseInt(btn.getAttribute('data-index') || '-1', 10);
+    }
+
+    listEl?.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+
+        const deleteBtn = target.closest('.delete-dev') as HTMLElement | null;
+        if (deleteBtn && import.meta.env.DEV) {
+            const index = Number.parseInt(deleteBtn.getAttribute('data-index') || '-1', 10);
             if (index < 0) return;
-            const devProducts = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const devProducts = getDevProducts();
             devProducts.splice(index, 1);
             localStorage.setItem(storageKey, JSON.stringify(devProducts));
             renderDevProducts();
+            return;
+        }
+
+        const editBtn = target.closest('.edit-btn') as HTMLElement | null;
+        if (!editBtn) return;
+
+        const index = Number.parseInt(editBtn.getAttribute('data-index') || '-1', 10);
+        const source = (editBtn.getAttribute('data-source') || 'base') as EditSource;
+        if (index < 0) return;
+
+        const current = source === 'dev' ? getDevProducts()[index] : baseProducts[index];
+        if (!current) return;
+        openEditModal(current, source, index);
+    });
+
+    addFormEl?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        if (!messageEl) return;
+
+        const payload = Object.fromEntries(Array.from(formData.entries()).map(([k, v]) => [k, String(v)])) as ProductPayload;
+
+        if (import.meta.env.DEV) {
+            const existing = getDevProducts();
+            existing.push(payload);
+            localStorage.setItem(storageKey, JSON.stringify(existing));
+            messageEl.textContent = 'Producto guardado en modo DEV.';
+            messageEl.className = 'text-green-500 text-sm mt-4';
+            form.reset();
+            renderDevProducts();
+            return;
+        }
+
+        const response = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(payload).toString(),
         });
-    }
 
-    if (formEl) {
-        formEl.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target as HTMLFormElement;
-            const formData = new FormData(form);
-            const messageEl = document.getElementById('form-message');
+        if (response.ok) {
+            messageEl.textContent = 'Product added successfully! Refreshing...';
+            messageEl.className = 'text-green-500 text-sm mt-4';
+            form.reset();
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            const text = await response.text();
+            messageEl.textContent = text || 'Error adding product.';
+            messageEl.className = 'text-red-500 text-sm mt-4';
+        }
+    });
 
-            if (!messageEl) {
-                console.error('Could not find form-message element');
+    editFormEl?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!editing || !editMessageEl) return;
+
+        const formData = new FormData(editFormEl);
+        const payload = Object.fromEntries(Array.from(formData.entries()).map(([k, v]) => [k, String(v)])) as ProductPayload;
+
+        if (import.meta.env.DEV && editing.source === 'dev') {
+            const existing = getDevProducts();
+            if (!existing[editing.index]) {
+                editMessageEl.textContent = 'No se encontro el producto a editar.';
+                editMessageEl.className = 'text-red-500 text-sm';
                 return;
             }
+            existing[editing.index] = payload;
+            localStorage.setItem(storageKey, JSON.stringify(existing));
+            editMessageEl.textContent = 'Producto actualizado en modo DEV.';
+            editMessageEl.className = 'text-green-500 text-sm';
+            renderDevProducts();
+            setTimeout(closeEditModal, 500);
+            return;
+        }
 
-            const params = new URLSearchParams();
-            formData.forEach((value, key) => {
-                params.append(key, String(value));
-            });
-
-            if (import.meta.env.DEV) {
-                const file = formData.get('imageFile') as File | null;
-                if (!file) {
-                    messageEl.textContent = 'Selecciona una imagen.';
-                    messageEl.className = 'text-red-500 text-sm mt-4';
-                    return;
-                }
-
-                const payload = Object.fromEntries(params.entries()) as Record<string, string>;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const imageUrl = String(reader.result || '');
-                    const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                    existing.push({
-                        ...payload,
-                        imageUrl,
-                    });
-                    localStorage.setItem(storageKey, JSON.stringify(existing));
-
-                    messageEl.textContent = 'Producto guardado en modo DEV.';
-                    messageEl.className = 'text-green-500 text-sm mt-4';
-                    form.reset();
-                    renderDevProducts();
-                };
-                reader.readAsDataURL(file);
-                return;
-            }
-
-            const response = await fetch('/api/products', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: params.toString()
-            });
-
-            if (response.ok) {
-                messageEl.textContent = 'Product added successfully! Refreshing...';
-                messageEl.className = 'text-green-500 text-sm mt-4';
-                form.reset();
-                setTimeout(() => window.location.reload(), 2000);
-            } else {
-                const text = await response.text();
-                if (text) {
-                    try {
-                        const data = JSON.parse(text);
-                        messageEl.textContent = data.message || text;
-                    } catch {
-                        messageEl.textContent = text;
-                    }
-                } else {
-                    messageEl.textContent = 'Error adding product.';
-                }
-                messageEl.className = 'text-red-500 text-sm mt-4';
-            }
+        const response = await fetch('/api/products', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ index: editing.index, ...payload }),
         });
-    }
+
+        if (response.ok) {
+            editMessageEl.textContent = 'Producto actualizado. Recargando...';
+            editMessageEl.className = 'text-green-500 text-sm';
+            setTimeout(() => window.location.reload(), 1200);
+        } else {
+            const text = await response.text();
+            editMessageEl.textContent = text || 'Error al actualizar producto.';
+            editMessageEl.className = 'text-red-500 text-sm';
+        }
+    });
+
+    document.getElementById('close-edit-product-modal')?.addEventListener('click', closeEditModal);
+    document.getElementById('cancel-edit-product')?.addEventListener('click', closeEditModal);
+
+    editModalEl?.addEventListener('click', (e) => {
+        if (e.target === editModalEl) closeEditModal();
+    });
 </script>
