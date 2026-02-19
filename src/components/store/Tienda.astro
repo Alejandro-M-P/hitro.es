@@ -1,1 +1,384 @@
-hola
+---
+// src/components/store/Tienda.astro
+import { ShoppingBag } from 'lucide-astro';
+import ProductModal from './ProductModal.astro';
+import { products } from '../../data/products';
+---
+
+<section class="py-16 md:py-24 px-4 bg-brand-bg relative overflow-hidden">
+  <div class="absolute inset-0 bg-[linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[0.05] -z-10"></div>
+  <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-blue/10 rounded-full blur-[120px] -z-10"></div>
+
+  <div class="max-w-7xl mx-auto relative z-10">
+    <div class="text-center mb-12 md:mb-16">
+      <h1 class="text-4xl md:text-6xl font-display font-black text-white uppercase tracking-tighter leading-tight">
+        Tienda <span class="text-brand-blue">Oficial</span>
+      </h1>
+      <p class="text-brand-muted text-lg md:text-xl font-sans mt-4 max-w-2xl mx-auto">
+        Equipacion y ropa de alta calidad para el entrenamiento y tu dia a dia.
+      </p>
+    </div>
+
+    <div id="store-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      {products.map((product) => (
+        <div class="product-card bg-brand-card border border-brand-border rounded-[2rem] overflow-hidden group transition-all duration-300 hover:border-brand-blue hover:-translate-y-2 hover:shadow-2xl shadow-black cursor-pointer h-full flex flex-col"
+             data-name={product.name}
+             data-price={product.price}
+             data-image={product.imageUrl}
+             data-description={product.description}>
+          <div class="relative">
+            <img src={product.imageUrl} alt={product.name} class="w-full h-80 object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+            <div class="absolute top-4 left-4 bg-black/50 text-white text-xs font-bold px-3 py-1 rounded-full">{product.category}</div>
+          </div>
+          <div class="p-6 text-center flex-1 flex flex-col">
+            <h3 class="text-base sm:text-lg font-display font-bold text-white mb-2">{product.name}</h3>
+            <p class="text-brand-blue font-sans font-black text-xl sm:text-2xl mb-4">{product.price}</p>
+            <button class="add-to-cart-btn mt-auto w-full inline-flex items-center justify-center gap-2 bg-brand-blue text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider text-sm">
+              <ShoppingBag class="w-4 h-4" />
+              Anadir al carrito
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div id="store-skeleton" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mt-6">
+      {Array.from({ length: 4 }).map(() => (
+        <div class="bg-brand-card border border-brand-border rounded-[2rem] overflow-hidden animate-pulse">
+          <div class="w-full h-80 bg-black/30"></div>
+          <div class="p-6 space-y-3">
+            <div class="h-6 bg-black/30 rounded-lg"></div>
+            <div class="h-7 bg-black/30 rounded-lg"></div>
+            <div class="h-11 bg-black/30 rounded-xl"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<div id="cart-overlay" class="fixed inset-0 bg-black/50 z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+<aside id="store-cart-panel" class="cart-panel fixed top-0 right-0 h-full z-50 w-full sm:w-[320px] md:w-[380px] max-w-[94vw] bg-brand-card border-l border-brand-border p-5 shadow-2xl shadow-black/40 translate-x-full transition-transform duration-300">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-white font-display font-bold uppercase tracking-wider text-lg">Tu carrito</h3>
+    <button id="close-cart" class="text-brand-muted hover:text-white transition-colors text-sm">Cerrar</button>
+  </div>
+
+  <div id="cart-items" class="space-y-3 max-h-[65vh] overflow-auto pr-1"></div>
+
+  <div class="mt-5 pt-4 border-t border-brand-border flex items-center justify-between">
+    <span class="text-brand-muted font-sans text-sm">Total</span>
+    <span id="cart-total" class="text-white font-sans font-black text-xl">0.00€</span>
+  </div>
+
+  <a href="/comprar" class="mt-4 w-full inline-flex items-center justify-center bg-white text-black font-bold uppercase tracking-wider text-sm py-3 rounded-xl hover:bg-brand-blue hover:text-white transition-all duration-300">
+    Finalizar compra
+  </a>
+</aside>
+
+<ProductModal />
+
+<script id="base-products-data" type="application/json" set:html={JSON.stringify(products)}></script>
+<script>
+  import { useStoreCatalog } from '../../hooks/useStoreCatalog';
+  import { useToast } from '../../hooks/useToast';
+  import type { StoreProduct } from '../../types/domain';
+
+  let model: ReturnType<typeof useStoreCatalog> | null = null;
+  let lastAddedId: number | null = null;
+  let onCartAdd: ((event: Event) => void) | null = null;
+  let onStorageChange: ((event: StorageEvent) => void) | null = null;
+
+  const toast = useToast();
+
+  function getBaseProducts(): StoreProduct[] {
+    const raw = document.getElementById('base-products-data')?.textContent || '[]';
+    try {
+      return JSON.parse(raw) as StoreProduct[];
+    } catch {
+      return [];
+    }
+  }
+
+  function buildCard(product: StoreProduct, index: number): string {
+    return `
+      <div class="product-card bg-brand-card border border-brand-border rounded-[2rem] overflow-hidden group transition-all duration-300 hover:border-brand-blue hover:-translate-y-2 hover:shadow-2xl shadow-black cursor-pointer h-full flex flex-col"
+           data-index="${index}">
+        <div class="relative">
+          <img src="${product.imageUrl || ''}" alt="${product.name || ''}" class="w-full h-80 object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+          <div class="absolute top-4 left-4 bg-black/50 text-white text-xs font-bold px-3 py-1 rounded-full">${product.category || ''}</div>
+        </div>
+        <div class="p-6 text-center flex-1 flex flex-col">
+          <h3 class="text-lg font-display font-bold text-white mb-2">${product.name || ''}</h3>
+          <p class="text-brand-blue font-sans font-black text-2xl mb-4">${product.price || ''}</p>
+          <button type="button" class="add-to-cart-btn mt-auto w-full inline-flex items-center justify-center gap-2 bg-brand-blue text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+              <path d="M3 6h18"></path>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            Anadir al carrito
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCatalog(gridEl: HTMLElement): void {
+    if (!model) return;
+    gridEl.innerHTML = model.products.map((product, index) => buildCard(product, index)).join('');
+  }
+
+  function renderCart(cartItemsEl: HTMLElement, cartTotalEl: HTMLElement, cartCountEl: HTMLElement): void {
+    if (!model) return;
+
+    if (model.cart.length === 0) {
+      cartItemsEl.innerHTML = `
+        <div class="text-brand-muted text-sm font-sans bg-black/20 rounded-2xl p-4 text-center">
+          Tu carrito esta vacio. Anade algo para verlo aqui.
+        </div>
+      `;
+      cartTotalEl.textContent = model.formatPrice(0);
+      cartCountEl.textContent = '0';
+      return;
+    }
+
+    cartItemsEl.innerHTML = model.cart.map((item) => {
+      const isNew = item.id === lastAddedId;
+      return `
+        <div class="cart-item flex items-center gap-3 bg-black/20 rounded-2xl p-3 ${isNew ? 'item-pop' : ''}">
+          <img src="${item.image}" alt="${item.name}" class="w-14 h-14 rounded-xl object-cover" />
+          <div class="flex-1">
+            <p class="text-white text-sm font-bold">${item.name}</p>
+            <p class="text-brand-muted text-xs">${item.price}</p>
+          </div>
+          <button type="button" class="remove-cart-item text-xs text-red-300 hover:text-red-100 border border-red-300/30 hover:border-red-100/40 rounded-lg px-2 py-1 transition-colors" data-remove-id="${item.id}">
+            Quitar
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    cartTotalEl.textContent = model.formatPrice(model.getTotal());
+    cartCountEl.textContent = String(model.cart.length);
+  }
+
+  function openModal(product: StoreProduct): void {
+    const modal = document.getElementById('product-modal') as HTMLElement | null;
+    const modalImage = document.getElementById('modal-image') as HTMLImageElement | null;
+    const modalName = document.getElementById('modal-name') as HTMLElement | null;
+    const modalPrice = document.getElementById('modal-price') as HTMLElement | null;
+    const modalDescription = document.getElementById('modal-description') as HTMLElement | null;
+
+    if (!modal || !modalImage || !modalName || !modalPrice || !modalDescription) return;
+
+    modalImage.src = product.imageUrl || '';
+    modalName.textContent = product.name || '';
+    modalPrice.textContent = product.price || '';
+    modalDescription.textContent = product.description || '';
+
+    modal.setAttribute('data-name', product.name || '');
+    modal.setAttribute('data-price', product.price || '');
+    modal.setAttribute('data-image', product.imageUrl || '');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    window.dispatchEvent(new CustomEvent('modal:open'));
+  }
+
+  function toggleCart(panel: HTMLElement, overlay: HTMLElement, open: boolean): void {
+    const toggleWrapper = document.getElementById('store-cart-toggle');
+    const toggleWrapperDesktop = document.getElementById('store-cart-toggle-desktop');
+    panel.classList.toggle('is-open', open);
+    overlay.classList.toggle('is-open', open);
+    toggleWrapper?.classList.toggle('is-hidden', open);
+    toggleWrapperDesktop?.classList.toggle('is-hidden', open);
+  }
+
+  function bumpCart(panel: HTMLElement): void {
+    panel.classList.add('cart-bump');
+    window.setTimeout(() => panel.classList.remove('cart-bump'), 400);
+  }
+
+  function addProductToCart(
+    product: StoreProduct,
+    cartPanel: HTMLElement,
+    cartOverlay: HTMLElement,
+    cartItemsEl: HTMLElement,
+    cartTotalEl: HTMLElement,
+    cartCountEl: HTMLElement
+  ): void {
+    if (!model) return;
+    const result = model.addToCart(product);
+    if (!result.accepted || !result.item) {
+      toast.info('Ya estamos procesando este producto...');
+      return;
+    }
+
+    lastAddedId = result.item.id;
+    renderCart(cartItemsEl, cartTotalEl, cartCountEl);
+    if (cartPanel.classList.contains('is-open')) {
+      bumpCart(cartPanel);
+    }
+    toast.success('Producto anadido al carrito');
+  }
+
+  function bindGridInteractions(
+    gridEl: HTMLElement,
+    cartPanel: HTMLElement,
+    cartOverlay: HTMLElement,
+    cartItemsEl: HTMLElement,
+    cartTotalEl: HTMLElement,
+    cartCountEl: HTMLElement
+  ): void {
+    gridEl.querySelectorAll('.product-card').forEach((card) => {
+      const index = Number.parseInt((card as HTMLElement).dataset.index || '-1', 10);
+      const product = model?.products[index];
+      if (!product) return;
+
+      const addBtn = card.querySelector('.add-to-cart-btn') as HTMLButtonElement | null;
+      addBtn?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (addBtn.disabled) return;
+        addBtn.disabled = true;
+        addBtn.classList.add('opacity-60', 'cursor-not-allowed');
+        addProductToCart(product, cartPanel, cartOverlay, cartItemsEl, cartTotalEl, cartCountEl);
+        window.setTimeout(() => {
+          addBtn.disabled = false;
+          addBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }, 650);
+      });
+
+      card.addEventListener('click', (event) => {
+        if ((event.target as HTMLElement).closest('.add-to-cart-btn')) return;
+        openModal(product);
+      });
+    });
+  }
+
+  async function hydrateCatalog(): Promise<void> {
+    const gridEl = document.getElementById('store-grid') as HTMLElement | null;
+    const skeletonEl = document.getElementById('store-skeleton') as HTMLElement | null;
+    const cartPanel = document.getElementById('store-cart-panel') as HTMLElement | null;
+    const cartOverlay = document.getElementById('cart-overlay') as HTMLElement | null;
+    const cartItemsEl = document.getElementById('cart-items') as HTMLElement | null;
+    const cartTotalEl = document.getElementById('cart-total') as HTMLElement | null;
+    const cartCountEl = document.getElementById('cart-count') as HTMLElement | null;
+
+    if (!gridEl || !cartPanel || !cartOverlay || !cartItemsEl || !cartTotalEl || !cartCountEl) return;
+
+    skeletonEl?.classList.remove('hidden');
+    gridEl.classList.add('opacity-0');
+
+    model = useStoreCatalog(getBaseProducts());
+    await model.load();
+
+    renderCatalog(gridEl);
+    bindGridInteractions(gridEl, cartPanel, cartOverlay, cartItemsEl, cartTotalEl, cartCountEl);
+    renderCart(cartItemsEl, cartTotalEl, cartCountEl);
+
+    skeletonEl?.classList.add('hidden');
+    gridEl.classList.remove('opacity-0');
+  }
+
+  async function runStoreHydration(): Promise<void> {
+    const cartToggle = document.querySelector('.cart-toggle') as HTMLButtonElement | null;
+    const cartPanel = document.getElementById('store-cart-panel') as HTMLElement | null;
+    const cartOverlay = document.getElementById('cart-overlay') as HTMLElement | null;
+    const closeCartBtn = document.getElementById('close-cart') as HTMLButtonElement | null;
+    const cartItemsEl = document.getElementById('cart-items') as HTMLElement | null;
+    const cartTotalEl = document.getElementById('cart-total') as HTMLElement | null;
+    const cartCountEl = document.getElementById('cart-count') as HTMLElement | null;
+    if (!cartToggle || !cartPanel || !cartOverlay || !closeCartBtn || !cartItemsEl || !cartTotalEl || !cartCountEl) return;
+
+    await hydrateCatalog();
+
+    cartToggle.onclick = () => {
+      toggleCart(cartPanel, cartOverlay, !cartPanel.classList.contains('is-open'));
+    };
+    closeCartBtn.onclick = () => toggleCart(cartPanel, cartOverlay, false);
+    cartOverlay.onclick = () => toggleCart(cartPanel, cartOverlay, false);
+
+    cartItemsEl.onclick = (event: Event) => {
+      const target = event.target as HTMLElement;
+      const removeBtn = target.closest('.remove-cart-item') as HTMLElement | null;
+      if (!removeBtn || !model) return;
+      const itemId = Number.parseInt(removeBtn.getAttribute('data-remove-id') || '-1', 10);
+      if (itemId < 0) return;
+
+      model.removeFromCart(itemId);
+      renderCart(cartItemsEl, cartTotalEl, cartCountEl);
+      toast.info('Producto quitado del carrito');
+    };
+
+    if (onCartAdd) {
+      window.removeEventListener('cart:add', onCartAdd as EventListener);
+    }
+    onCartAdd = (event: Event) => {
+      const detail = (event as CustomEvent).detail as { name: string; price: string; image: string };
+      addProductToCart(
+        {
+          name: detail.name || 'Producto',
+          price: detail.price || '0.00€',
+          imageUrl: detail.image || '',
+          category: 'General',
+          description: '',
+        },
+        cartPanel,
+        cartOverlay,
+        cartItemsEl,
+        cartTotalEl,
+        cartCountEl
+      );
+    };
+    window.addEventListener('cart:add', onCartAdd as EventListener);
+
+    if (onStorageChange) {
+      window.removeEventListener('storage', onStorageChange);
+    }
+    onStorageChange = async (event: StorageEvent) => {
+      if (event.key !== 'hitro_products_dev') return;
+      await hydrateCatalog();
+    };
+    window.addEventListener('storage', onStorageChange);
+  }
+
+  document.addEventListener('astro:page-load', runStoreHydration);
+  document.addEventListener('DOMContentLoaded', runStoreHydration);
+</script>
+
+<style>
+  .cart-panel.is-open {
+    transform: translateX(0);
+  }
+
+  .store-cart.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #cart-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cart-bump {
+    animation: cart-bump 0.4s ease;
+  }
+
+  .item-pop {
+    animation: item-pop 0.35s ease;
+  }
+
+  @keyframes cart-bump {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+  }
+
+  @keyframes item-pop {
+    0% { transform: translateY(6px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+</style>

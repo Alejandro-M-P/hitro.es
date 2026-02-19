@@ -1,0 +1,431 @@
+---
+// src/pages/admin/products.astro
+import Layout from '../../layouts/Layout.astro';
+import { products } from '../../data/products';
+
+export const prerender = false;
+
+const session = Astro.cookies.get('session');
+const isDev = import.meta.env.DEV;
+
+if (!isDev && session?.value !== 'admin') {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<Layout title="Gestionar Productos | HITRO">
+  <main class="py-12 bg-brand-bg min-h-screen">
+    <div class="max-w-4xl mx-auto px-4">
+      <a href="/admin" class="text-brand-muted hover:text-white inline-block mb-6">&larr; Volver al panel</a>
+      <h1 class="text-4xl font-display font-black text-white uppercase mb-8">Gestionar productos</h1>
+
+      <form id="add-product-form" class="bg-brand-card border border-brand-border rounded-[2rem] p-8 mb-12">
+        <h2 class="text-2xl font-display font-bold text-white mb-6">Agregar nuevo producto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="name" class="block text-brand-muted font-sans text-sm mb-2">Nombre del producto</label>
+            <input type="text" id="name" name="name" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+          </div>
+          <div>
+            <label for="price" class="block text-brand-muted font-sans text-sm mb-2">Precio (ejemplo: 35.00€)</label>
+            <input type="text" id="price" name="price" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+          </div>
+          <div>
+            <label for="category" class="block text-brand-muted font-sans text-sm mb-2">Categoria</label>
+            <input type="text" id="category" name="category" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+          </div>
+          <div>
+            <label for="imageFile" class="block text-brand-muted font-sans text-sm mb-2">Imagen del producto</label>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue">
+          </div>
+          <div class="md:col-span-2">
+            <label for="description" class="block text-brand-muted font-sans text-sm mb-2">Descripcion</label>
+            <textarea id="description" name="description" rows="4" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="mt-6 w-full md:w-auto bg-brand-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider">
+          Agregar producto
+        </button>
+        <p id="form-message" class="text-sm mt-4"></p>
+      </form>
+
+      <h2 class="text-2xl font-display font-bold text-white mb-6">Productos actuales</h2>
+      <div id="product-list" class="grid grid-cols-1 gap-4">
+        {products.map((product, index) => (
+          <div class="bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4">
+            <img src={product.imageUrl} alt={product.name} class="w-20 h-20 rounded-lg object-cover">
+            <div class="flex-1">
+              <p class="text-white font-bold">{product.name}</p>
+              <p class="text-brand-muted text-sm">{product.price}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="edit-btn bg-yellow-500 text-white text-xs font-bold px-3 py-2 rounded-lg" data-source="base" data-index={index}>Editar</button>
+              <button class="delete-dev hidden bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index={index}>Eliminar</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <div id="edit-product-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70">
+    <div class="w-full max-w-3xl bg-brand-card border border-brand-border rounded-2xl p-6 md:p-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-display font-bold text-white">Editar producto</h2>
+        <button id="close-edit-product-modal" type="button" class="text-brand-muted hover:text-white text-xl">&times;</button>
+      </div>
+
+      <form id="edit-product-form" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="edit-name" class="block text-brand-muted font-sans text-sm mb-2">Nombre del producto</label>
+            <input id="edit-name" name="name" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+          </div>
+          <div>
+            <label for="edit-price" class="block text-brand-muted font-sans text-sm mb-2">Precio</label>
+            <input id="edit-price" name="price" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+          </div>
+          <div>
+            <label for="edit-category" class="block text-brand-muted font-sans text-sm mb-2">Categoria</label>
+            <input id="edit-category" name="category" type="text" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+          </div>
+          <div>
+            <label for="edit-image-file" class="block text-brand-muted font-sans text-sm mb-2">Imagen del producto (subir nueva opcional)</label>
+            <input id="edit-image-file" name="imageFile" type="file" accept="image/*" class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white">
+          </div>
+          <div class="md:col-span-2">
+            <img id="edit-image-preview" src="" alt="Previsualizacion" class="hidden w-28 h-28 object-cover rounded-lg border border-brand-border">
+          </div>
+          <div class="md:col-span-2">
+            <label for="edit-description" class="block text-brand-muted font-sans text-sm mb-2">Descripcion</label>
+            <textarea id="edit-description" name="description" rows="4" required class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white"></textarea>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-3 pt-2">
+          <button id="save-edit-product" type="submit" class="bg-brand-blue text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-600 uppercase tracking-wider">Guardar cambios</button>
+          <button id="cancel-edit-product" type="button" class="bg-brand-border text-white font-bold py-3 px-8 rounded-lg hover:bg-neutral-700 uppercase tracking-wider">Cancelar</button>
+        </div>
+        <p id="edit-form-message" class="text-sm"></p>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<script id="base-products-data" type="application/json" set:html={JSON.stringify(products)}></script>
+<script>
+  import { useAdminPanel } from '../../hooks/useAdminPanel';
+  import { useAuth } from '../../hooks/useAuth';
+  import { useToast } from '../../hooks/useToast';
+
+  const auth = useAuth();
+  const toast = useToast();
+
+  if (import.meta.env.DEV && !auth.isDevAuthenticated()) {
+    window.location.href = '/admin/login';
+  }
+
+  type ProductPayload = {
+    name: string;
+    price: string;
+    category: string;
+    imageUrl: string;
+    description: string;
+  };
+
+  type EditSource = 'base' | 'dev';
+
+  const addFormEl = document.getElementById('add-product-form') as HTMLFormElement | null;
+  const listEl = document.getElementById('product-list');
+  const messageEl = document.getElementById('form-message');
+  const storageKey = 'hitro_products_dev';
+  const panel = useAdminPanel<ProductPayload>(storageKey);
+  const baseProducts = JSON.parse(document.getElementById('base-products-data')?.textContent || '[]') as ProductPayload[];
+
+  const editModalEl = document.getElementById('edit-product-modal');
+  const editFormEl = document.getElementById('edit-product-form') as HTMLFormElement | null;
+  const editMessageEl = document.getElementById('edit-form-message');
+  const editImagePreview = document.getElementById('edit-image-preview') as HTMLImageElement | null;
+
+  let editing: { source: EditSource; index: number; imageUrl: string } | null = null;
+
+  function fileToDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('No se pudo leer la imagen'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function getDevProducts(): ProductPayload[] {
+    return panel.getLocal();
+  }
+
+  function normalizeProduct(payload: Partial<ProductPayload>): ProductPayload {
+    return {
+      name: payload.name || '',
+      price: payload.price || '',
+      category: payload.category || '',
+      imageUrl: payload.imageUrl || '',
+      description: payload.description || '',
+    };
+  }
+
+  function openEditModal(item: ProductPayload, source: EditSource, index: number) {
+    if (!editFormEl || !editModalEl) return;
+    editing = { source, index, imageUrl: item.imageUrl || '' };
+
+    (editFormEl.elements.namedItem('name') as HTMLInputElement).value = item.name || '';
+    (editFormEl.elements.namedItem('price') as HTMLInputElement).value = item.price || '';
+    (editFormEl.elements.namedItem('category') as HTMLInputElement).value = item.category || '';
+    (editFormEl.elements.namedItem('description') as HTMLTextAreaElement).value = item.description || '';
+
+    if (editImagePreview && item.imageUrl) {
+      editImagePreview.src = item.imageUrl;
+      editImagePreview.classList.remove('hidden');
+    }
+
+    if (editMessageEl) editMessageEl.textContent = '';
+    editModalEl.classList.remove('hidden');
+    editModalEl.classList.add('flex');
+  }
+
+  function closeEditModal() {
+    if (!editModalEl || !editFormEl) return;
+    editing = null;
+    editFormEl.reset();
+    if (editImagePreview) {
+      editImagePreview.src = '';
+      editImagePreview.classList.add('hidden');
+    }
+    editModalEl.classList.add('hidden');
+    editModalEl.classList.remove('flex');
+  }
+
+  function renderDevProducts() {
+    if (!listEl) return;
+    listEl.querySelectorAll('[data-dev-product]').forEach((el) => el.remove());
+
+    getDevProducts().forEach((product, index) => {
+      const item = document.createElement('div');
+      item.className = 'bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4';
+      item.setAttribute('data-dev-product', 'true');
+      item.innerHTML = `
+        <img src="${product.imageUrl || ''}" alt="${product.name || ''}" class="w-20 h-20 rounded-lg object-cover">
+        <div class="flex-1">
+          <p class="text-white font-bold">${product.name || ''}</p>
+          <p class="text-brand-muted text-sm">${product.price || ''}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="edit-btn bg-yellow-500 text-white text-xs font-bold px-3 py-2 rounded-lg" data-source="dev" data-index="${index}">Editar</button>
+          <button class="delete-dev bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg" data-index="${index}">Eliminar</button>
+        </div>
+      `;
+      listEl.appendChild(item);
+    });
+  }
+
+  async function getPayloadFromAddForm(form: HTMLFormElement): Promise<ProductPayload | null> {
+    const imageInput = form.elements.namedItem('imageFile') as HTMLInputElement;
+    const selectedFile = imageInput?.files?.[0];
+
+    if (!selectedFile) {
+      toast.error('Debes subir una imagen para el producto');
+      return null;
+    }
+
+    const imageUrl = await fileToDataUrl(selectedFile);
+    return normalizeProduct({
+      name: (form.elements.namedItem('name') as HTMLInputElement).value,
+      price: (form.elements.namedItem('price') as HTMLInputElement).value,
+      category: (form.elements.namedItem('category') as HTMLInputElement).value,
+      description: (form.elements.namedItem('description') as HTMLTextAreaElement).value,
+      imageUrl,
+    });
+  }
+
+  async function getPayloadFromEditForm(form: HTMLFormElement): Promise<ProductPayload | null> {
+    if (!editing) return null;
+
+    const imageInput = form.elements.namedItem('imageFile') as HTMLInputElement;
+    const selectedFile = imageInput?.files?.[0];
+    const imageUrl = selectedFile ? await fileToDataUrl(selectedFile) : editing.imageUrl;
+
+    if (!imageUrl) {
+      toast.error('El producto necesita una imagen');
+      return null;
+    }
+
+    return normalizeProduct({
+      name: (form.elements.namedItem('name') as HTMLInputElement).value,
+      price: (form.elements.namedItem('price') as HTMLInputElement).value,
+      category: (form.elements.namedItem('category') as HTMLInputElement).value,
+      description: (form.elements.namedItem('description') as HTMLTextAreaElement).value,
+      imageUrl,
+    });
+  }
+
+  if (import.meta.env.DEV) {
+    renderDevProducts();
+  }
+
+  listEl?.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+
+    const deleteBtn = target.closest('.delete-dev') as HTMLElement | null;
+    if (deleteBtn && import.meta.env.DEV) {
+      const index = Number.parseInt(deleteBtn.getAttribute('data-index') || '-1', 10);
+      if (index < 0) return;
+      panel.deleteLocal(index);
+      toast.success('Producto eliminado');
+      renderDevProducts();
+      return;
+    }
+
+    const editBtn = target.closest('.edit-btn') as HTMLElement | null;
+    if (!editBtn) return;
+
+    const index = Number.parseInt(editBtn.getAttribute('data-index') || '-1', 10);
+    const source = (editBtn.getAttribute('data-source') || 'base') as EditSource;
+    if (index < 0) return;
+
+    const current = source === 'dev' ? getDevProducts()[index] : baseProducts[index];
+    if (!current) return;
+    openEditModal(normalizeProduct(current), source, index);
+  });
+
+  addFormEl?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+    if (!messageEl || submitBtn?.disabled) return;
+
+    submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+    submitBtn.disabled = true;
+
+    try {
+      const payload = await getPayloadFromAddForm(form);
+      if (!payload) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        return;
+      }
+
+      if (import.meta.env.DEV) {
+        panel.addLocal(payload);
+        messageEl.textContent = 'Producto guardado en modo DEV.';
+        messageEl.className = 'text-green-500 text-sm mt-4';
+        toast.success('Producto guardado');
+        form.reset();
+        renderDevProducts();
+        return;
+      }
+
+      const result = await panel.send(
+        '/products',
+        'POST',
+        new URLSearchParams(payload as Record<string, string>).toString(),
+        { 'Content-Type': 'application/x-www-form-urlencoded' }
+      );
+
+      if (result.ok) {
+        messageEl.textContent = 'Producto agregado correctamente. Recargando...';
+        messageEl.className = 'text-green-500 text-sm mt-4';
+        toast.success('Producto guardado');
+        form.reset();
+        window.setTimeout(() => window.location.reload(), 1200);
+      } else {
+        messageEl.textContent = result.message || 'Error al agregar producto.';
+        messageEl.className = 'text-red-500 text-sm mt-4';
+        toast.error('No se pudo guardar el producto');
+      }
+    } catch (error) {
+      console.error(error);
+      messageEl.textContent = 'No se pudo procesar la imagen del producto.';
+      messageEl.className = 'text-red-500 text-sm mt-4';
+      toast.error('No se pudo guardar el producto');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+    }
+  });
+
+  editFormEl?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!editing || !editMessageEl) return;
+
+    const submitBtn = editFormEl.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+    if (submitBtn?.disabled) return;
+    submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+    submitBtn.disabled = true;
+
+    try {
+      const payload = await getPayloadFromEditForm(editFormEl);
+      if (!payload) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        return;
+      }
+
+      if (import.meta.env.DEV && editing.source === 'dev') {
+        const existing = getDevProducts();
+        if (!existing[editing.index]) {
+          editMessageEl.textContent = 'No se encontro el producto a editar.';
+          editMessageEl.className = 'text-red-500 text-sm';
+          return;
+        }
+        existing[editing.index] = payload;
+        panel.setLocal(existing);
+        editMessageEl.textContent = 'Producto actualizado en modo DEV.';
+        editMessageEl.className = 'text-green-500 text-sm';
+        toast.success('Producto actualizado');
+        renderDevProducts();
+        window.setTimeout(closeEditModal, 500);
+        return;
+      }
+
+      const result = await panel.send(
+        '/products',
+        'PUT',
+        JSON.stringify({ index: editing.index, ...payload }),
+        { 'Content-Type': 'application/json' }
+      );
+
+      if (result.ok) {
+        editMessageEl.textContent = 'Producto actualizado. Recargando...';
+        editMessageEl.className = 'text-green-500 text-sm';
+        toast.success('Producto actualizado');
+        window.setTimeout(() => window.location.reload(), 1200);
+      } else {
+        editMessageEl.textContent = result.message || 'Error al actualizar producto.';
+        editMessageEl.className = 'text-red-500 text-sm';
+        toast.error('No se pudo actualizar el producto');
+      }
+    } catch (error) {
+      console.error(error);
+      editMessageEl.textContent = 'No se pudo leer la imagen del producto.';
+      editMessageEl.className = 'text-red-500 text-sm';
+      toast.error('No se pudo actualizar el producto');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+    }
+  });
+
+  const editImageInput = document.getElementById('edit-image-file') as HTMLInputElement | null;
+  editImageInput?.addEventListener('change', async () => {
+    const selectedFile = editImageInput.files?.[0];
+    if (!selectedFile || !editImagePreview) return;
+    const imageUrl = await fileToDataUrl(selectedFile);
+    editImagePreview.src = imageUrl;
+    editImagePreview.classList.remove('hidden');
+  });
+
+  document.getElementById('close-edit-product-modal')?.addEventListener('click', closeEditModal);
+  document.getElementById('cancel-edit-product')?.addEventListener('click', closeEditModal);
+
+  editModalEl?.addEventListener('click', (e) => {
+    if (e.target === editModalEl) closeEditModal();
+  });
+</script>

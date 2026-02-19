@@ -1,0 +1,85 @@
+---
+// src/pages/admin/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/index/NavBar.astro';
+
+export const prerender = false;
+
+const session = Astro.cookies.get('session');
+const isDev = import.meta.env.DEV;
+
+if (!isDev && session?.value !== 'admin') {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<Layout title="Panel de Administracion | HITRO">
+  <Navbar />
+  <main class="pt-24 bg-brand-bg min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-display font-black text-white uppercase">Panel de administracion</h1>
+        <button id="logout-btn" class="bg-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-300 uppercase tracking-wider text-sm">
+          Salir
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Gestionar productos -->
+        <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Gestionar productos</h2>
+          <p class="text-brand-muted mb-6">Agrega, edita o elimina productos de la tienda.</p>
+          <a href="/admin/products" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
+            Gestionar productos
+          </a>
+        </div>
+
+        <!-- Gestionar cursos -->
+        <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Gestionar cursos</h2>
+          <p class="text-brand-muted mb-6">Agrega, edita o elimina cursos.</p>
+          <a href="/admin/courses" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
+            Gestionar cursos
+          </a>
+        </div>
+
+        <!-- Gestionar videos -->
+        <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Gestionar videos</h2>
+          <p class="text-brand-muted mb-6">Agrega, edita o elimina videos del aula virtual.</p>
+           <a href="/admin/videos" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
+            Gestionar videos
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { useAuth } from '../../hooks/useAuth';
+  import { useToast } from '../../hooks/useToast';
+
+  const auth = useAuth();
+  const toast = useToast();
+
+  if (import.meta.env.DEV) {
+    if (!auth.isDevAuthenticated()) {
+      window.location.href = '/admin/login';
+    }
+  }
+
+  document.getElementById('logout-btn')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    if (button.disabled) return;
+    button.disabled = true;
+    button.classList.add('opacity-60', 'cursor-not-allowed');
+
+    auth.logout();
+    await fetch('/api/logout', { method: 'POST' });
+    toast.info('Sesion cerrada');
+    window.setTimeout(() => {
+      window.location.href = '/admin/login';
+    }, 300);
+  });
+</script>

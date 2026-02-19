@@ -1,0 +1,88 @@
+---
+// src/pages/aula/[slug].astro
+import Layout from '../../layouts/Layout.astro';
+import { videos } from '../../data/videos';
+import Navbar from '../../components/index/NavBar.astro';
+
+export async function getStaticPaths() {
+  return videos.map(lesson => ({
+    params: { slug: lesson.slug },
+    props: { lesson },
+  }));
+}
+
+const { lesson } = Astro.props;
+const lessonIndex = videos.findIndex((item) => item.slug === lesson.slug);
+---
+
+<Layout title={`${lesson.title} | Aula Virtual | HITRO`}>
+  <Navbar />
+  
+  <main class="pt-24 bg-brand-bg min-h-screen">
+    <div id="lesson-wrapper" data-lesson-index={lessonIndex} class="max-w-4xl mx-auto px-4 py-12">
+      
+      <!-- Video Player -->
+      <div id="lesson-player" class="aspect-video bg-black rounded-2xl mb-8 border border-brand-border overflow-hidden shadow-2xl shadow-brand-blue/10">
+        <iframe
+          id="lesson-iframe"
+          width="100%"
+          height="100%"
+          src={`https://www.youtube.com/embed/${lesson.youtubeId}`}
+          title={lesson.title}
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div id="lesson-locked-state" class="hidden bg-brand-card border border-brand-border rounded-2xl p-6 mb-8 text-center">
+        <p class="text-brand-blue uppercase tracking-widest text-xs font-bold mb-2">Leccion bloqueada</p>
+        <p class="text-brand-muted">Completa las lecciones anteriores desde el Aula Virtual para acceder a este contenido.</p>
+      </div>
+
+      <!-- Lesson Details -->
+      <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-brand-blue font-sans font-semibold text-xs uppercase tracking-widest">{lesson.category}</span>
+          <span class="text-brand-muted font-sans text-sm">{lesson.duration}</span>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-display font-black text-white uppercase mb-4">{lesson.title}</h1>
+        <p class="text-brand-muted font-sans text-lg leading-relaxed">
+          {lesson.description}
+        </p>
+      </div>
+
+        <!-- Back to Aula Virtual -->
+        <div class="text-center mt-12">
+            <a href="/AulaVirtual" class="inline-flex items-center gap-2 text-brand-muted hover:text-white transition-colors font-sans">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                Volver al Aula Virtual
+            </a>
+        </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { readStorage } from '../../services/storage';
+  import { useToast } from '../../hooks/useToast';
+
+  const initLessonAccess = () => {
+    const wrapper = document.getElementById('lesson-wrapper');
+    const player = document.getElementById('lesson-player');
+    const iframe = document.getElementById('lesson-iframe') as HTMLIFrameElement | null;
+    const lockedState = document.getElementById('lesson-locked-state');
+    if (!wrapper || !player || !iframe || !lockedState) return;
+
+    const index = Number.parseInt(wrapper.getAttribute('data-lesson-index') || '0', 10);
+    const unlockedCount = readStorage<number>('hitro_lessons_unlocked_count', 1);
+    if (index < unlockedCount) return;
+
+    iframe.src = '';
+    player.classList.add('hidden');
+    lockedState.classList.remove('hidden');
+    useToast().info('Esta leccion aun no esta desbloqueada');
+  };
+
+  document.addEventListener('astro:page-load', initLessonAccess);
+  document.addEventListener('DOMContentLoaded', initLessonAccess);
+</script>
