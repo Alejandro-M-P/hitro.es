@@ -1,18 +1,18 @@
 ---
 // src/pages/aula/[slug].astro
 import Layout from '../../layouts/Layout.astro';
-import { lessons } from '../../data/lessons';
+import { videos } from '../../data/videos';
 import Navbar from '../../components/index/NavBar.astro';
 
 export async function getStaticPaths() {
-  return lessons.map(lesson => ({
+  return videos.map(lesson => ({
     params: { slug: lesson.slug },
     props: { lesson },
   }));
 }
 
 const { lesson } = Astro.props;
-const lessonIndex = lessons.findIndex((item) => item.slug === lesson.slug);
+const lessonIndex = videos.findIndex((item) => item.slug === lesson.slug);
 ---
 
 <Layout title={`${lesson.title} | Aula Virtual | HITRO`}>

@@ -1,7 +1,7 @@
 ---
 // src/pages/admin/courses.astro
 import Layout from '../../layouts/Layout.astro';
-import { lessons } from '../../data/lessons';
+import { trainingCourses } from '../../data/training';
 
 export const prerender = false;
 
@@ -67,7 +67,7 @@ if (!isDev && session?.value !== 'admin') {
 
       <h2 class="text-2xl font-display font-bold text-white mb-6">Cursos actuales</h2>
       <div id="course-list" class="grid grid-cols-1 gap-4">
-        {lessons.map((lesson, index) => (
+        {trainingCourses.map((lesson, index) => (
           <div class="bg-brand-card border border-brand-border rounded-xl p-4 flex items-center gap-4">
             <img src={lesson.imageUrl} alt={lesson.title} class="w-20 h-20 rounded-lg object-cover">
             <div class="flex-1">
@@ -144,7 +144,7 @@ if (!isDev && session?.value !== 'admin') {
   </div>
 </Layout>
 
-<script id="base-courses-data" type="application/json" set:html={JSON.stringify(lessons)}></script>
+<script id="base-courses-data" type="application/json" set:html={JSON.stringify(trainingCourses)}></script>
 <script>
   import { useAdminPanel } from '../../hooks/useAdminPanel';
   import { useAuth } from '../../hooks/useAuth';

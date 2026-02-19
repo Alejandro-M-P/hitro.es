@@ -1,6 +1,6 @@
 ---
 // src/components/aula/Aula-Virtual.astro
-import { lessons } from '../../data/lessons';
+import { videos } from '../../data/videos';
 import { Image } from 'astro:assets';
 ---
 
@@ -19,7 +19,7 @@ import { Image } from 'astro:assets';
     </div>
 
     <div id="aula-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-      {lessons.map((lesson) => (
+      {videos.map((lesson) => (
         <a
           href={`/aula/${lesson.slug}`}
           class="video-card bg-brand-card border border-brand-border rounded-[2rem] overflow-hidden group transition-all duration-300 hover:border-brand-blue hover:-translate-y-2 hover:shadow-2xl shadow-black"
@@ -82,7 +82,7 @@ import { Image } from 'astro:assets';
   </div>
 </div>
 
-<script id="base-lessons-data" type="application/json" set:html={JSON.stringify(lessons)}></script>
+<script id="base-lessons-data" type="application/json" set:html={JSON.stringify(videos)}></script>
 <script>
   import { useCourses } from '../../hooks/useCourses';
   import { useToast } from '../../hooks/useToast';

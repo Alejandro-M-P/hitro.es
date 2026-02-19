@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import fs from 'fs/promises';
 import path from 'path';
-import { lessons } from '../../data/lessons';
+import { trainingCourses } from '../../data/training';
 import { PlayCircle, Shield, Zap } from 'lucide-astro';
 
 export const prerender = false;
@@ -21,7 +21,7 @@ type CourseItem = {
 };
 
 const DEFAULT_IMAGE_URL = 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800&auto=format&fit=crop';
-const lessonsFilePath = path.resolve(process.cwd(), 'src/data/lessons.ts');
+const lessonsFilePath = path.resolve(process.cwd(), 'src/data/training.ts');
 
 function getIconFromCategory(category: string): IconName {
   if (category.includes('Mentalidad')) return 'Zap';
@@ -72,7 +72,7 @@ async function readRequestData(request: Request): Promise<Record<string, string>
 }
 
 async function readLessons(): Promise<CourseItem[]> {
-  return (lessons as Array<Record<string, unknown>>).map((lesson) => ({
+  return (trainingCourses as Array<Record<string, unknown>>).map((lesson) => ({
     title: String(lesson.title || ''),
     slug: String(lesson.slug || ''),
     category: String(lesson.category || ''),
@@ -91,10 +91,10 @@ async function writeLessons(nextLessons: CourseItem[]) {
     '"icon": $1'
   );
 
-  const nextContent = `// src/data/lessons.ts
+  const nextContent = `// src/data/training.ts
 import { PlayCircle, Shield, Zap } from 'lucide-astro';
 
-export const lessons = ${serialized};
+export const trainingCourses = ${serialized};
 `;
   await fs.writeFile(lessonsFilePath, nextContent, 'utf-8');
 }

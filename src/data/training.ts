@@ -1,18 +1,7 @@
-// src/data/lessons.ts
+// src/data/training.ts
 import { PlayCircle, Shield, Zap } from 'lucide-astro';
 
-export const lessons = [
-  {
-    "title": "Metodo HITRO Adultos",
-    "slug": "metodo-hitro-adultos",
-    "category": "Formacion Especializada · Metodo HITRO Adultos",
-    "imageUrl": "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800&auto=format&fit=crop",
-    "duration": "12:45",
-    "icon": Shield,
-    "price": "400€",
-    "youtubeId": "dQw4w9WgXcQ",
-    "description": "Formacion completa que abarca desde la prevencion primaria hasta el combate cuerpo a cuerpo y el control del estres."
-  },
+export const trainingCourses = [
   {
     "title": "Metodo HITRO Femenino",
     "slug": "metodo-hitro-femenino",
