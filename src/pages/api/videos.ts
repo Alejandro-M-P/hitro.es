@@ -101,7 +101,7 @@ async function readLessons(): Promise<LessonItem[]> {
         imageUrl: String(lesson.imageUrl || ''),
         duration: String(lesson.duration || ''),
         icon: toIconName(lesson.icon, String(lesson.category || '')),
-        price: String(lesson.price || '49.99€'),
+        price: String(lesson.price || ''),
         youtubeId: String(lesson.youtubeId || ''),
         description: String(lesson.description || ''),
     }));
@@ -137,7 +137,7 @@ export const POST: APIRoute = async ({ request }) => {
         ...payload,
         slug: slugify(payload.title),
         icon: getIconFromCategory(payload.category),
-        price: '49.99€',
+        price: '',
     };
 
     try {

@@ -13,42 +13,42 @@ if (!isDev && session?.value !== 'admin') {
 }
 ---
 
-<Layout title="Admin Dashboard | HITRO">
+<Layout title="Panel de Administracion | HITRO">
   <Navbar />
   <main class="pt-24 bg-brand-bg min-h-screen">
     <div class="max-w-4xl mx-auto px-4 py-12">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-4xl font-display font-black text-white uppercase">Admin Dashboard</h1>
+        <h1 class="text-4xl font-display font-black text-white uppercase">Panel de administracion</h1>
         <button id="logout-btn" class="bg-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-300 uppercase tracking-wider text-sm">
-          Logout
+          Salir
         </button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Manage Products -->
+        <!-- Gestionar productos -->
         <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
-          <h2 class="text-2xl font-display font-bold text-white mb-4">Manage Products</h2>
-          <p class="text-brand-muted mb-6">Add, edit, or delete products from the store.</p>
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Gestionar productos</h2>
+          <p class="text-brand-muted mb-6">Agrega, edita o elimina productos de la tienda.</p>
           <a href="/admin/products" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
-            Manage Products
+            Gestionar productos
           </a>
         </div>
 
-        <!-- Manage Courses -->
+        <!-- Gestionar cursos -->
         <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
-          <h2 class="text-2xl font-display font-bold text-white mb-4">Manage Courses</h2>
-          <p class="text-brand-muted mb-6">Add, edit, or delete courses.</p>
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Gestionar cursos</h2>
+          <p class="text-brand-muted mb-6">Agrega, edita o elimina cursos.</p>
           <a href="/admin/courses" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
-            Manage Courses
+            Gestionar cursos
           </a>
         </div>
 
-        <!-- Manage Videos -->
+        <!-- Gestionar videos -->
         <div class="bg-brand-card border border-brand-border rounded-[2rem] p-8">
-          <h2 class="text-2xl font-display font-bold text-white mb-4">Manage Videos</h2>
-          <p class="text-brand-muted mb-6">Add, edit, or delete videos from the virtual classroom.</p>
+          <h2 class="text-2xl font-display font-bold text-white mb-4">Gestionar videos</h2>
+          <p class="text-brand-muted mb-6">Agrega, edita o elimina videos del aula virtual.</p>
            <a href="/admin/videos" class="w-full text-center bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider block">
-            Manage Videos
+            Gestionar videos
           </a>
         </div>
       </div>
@@ -57,15 +57,29 @@ if (!isDev && session?.value !== 'admin') {
 </Layout>
 
 <script>
+  import { useAuth } from '../../hooks/useAuth';
+  import { useToast } from '../../hooks/useToast';
+
+  const auth = useAuth();
+  const toast = useToast();
+
   if (import.meta.env.DEV) {
-    const session = localStorage.getItem('admin_session');
-    if (session !== 'admin') {
+    if (!auth.isDevAuthenticated()) {
       window.location.href = '/admin/login';
     }
   }
 
-  document.getElementById('logout-btn').addEventListener('click', async () => {
+  document.getElementById('logout-btn')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    if (button.disabled) return;
+    button.disabled = true;
+    button.classList.add('opacity-60', 'cursor-not-allowed');
+
+    auth.logout();
     await fetch('/api/logout', { method: 'POST' });
-    window.location.href = '/admin/login';
+    toast.info('Sesion cerrada');
+    window.setTimeout(() => {
+      window.location.href = '/admin/login';
+    }, 300);
   });
 </script>

@@ -49,7 +49,10 @@ import { X } from 'lucide-astro';
 </div>
 
 <script>
+  import { useToast } from '../../hooks/useToast';
+
   const initProductModal = () => {
+    const toast = useToast();
     const modal = document.getElementById('product-modal') as HTMLElement;
     const closeModalBtn = document.getElementById('close-modal') as HTMLButtonElement;
     const modalContent = document.getElementById('modal-content') as HTMLElement;
@@ -92,12 +95,16 @@ import { X } from 'lucide-astro';
     });
 
     ratingSubmit.addEventListener('click', () => {
+      toast.success('Valoracion enviada');
       ratingNote.value = '';
       currentRating = 0;
       updateStars(0);
     });
 
     addToCartBtn.addEventListener('click', () => {
+      if (addToCartBtn.disabled) return;
+      addToCartBtn.disabled = true;
+      addToCartBtn.classList.add('opacity-60', 'cursor-not-allowed');
       const detail = {
         name: modal.getAttribute('data-name') || '',
         price: modal.getAttribute('data-price') || '',
@@ -105,6 +112,10 @@ import { X } from 'lucide-astro';
       };
       window.dispatchEvent(new CustomEvent('cart:add', { detail }));
       closeModal();
+      window.setTimeout(() => {
+        addToCartBtn.disabled = false;
+        addToCartBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+      }, 650);
     });
 
     closeModalBtn.addEventListener('click', (e) => {

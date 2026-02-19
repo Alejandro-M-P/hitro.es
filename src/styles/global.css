@@ -8,3 +8,9 @@ html {
 section {
   scroll-margin-top: 80px; 
 }
+
+/* cart toggle visibility when panel opens */
+#store-cart-toggle.store-cart.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
