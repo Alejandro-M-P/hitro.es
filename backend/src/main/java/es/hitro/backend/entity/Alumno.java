@@ -19,10 +19,10 @@ public class Alumno {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "telefono", length = 25, unique = true)
+    @Column(name = "telefono", length = 15, unique = true)
     private String telefono;
 
-    @Column(name = "dni", length = 20,  unique = true)
+    @Column(name = "dni", length = 13,  unique = true)
     private String dni;
 
     @Column(name = "password",nullable = false)
@@ -56,20 +56,30 @@ public class Alumno {
 
     // --- SETTERS
     public void setNombre(String nombre) {
+
         this.nombre = (nombre != null) ? nombre.trim() : null;
     }
 
     public void setApellidos(String apellidos) {
+
         this.apellidos = (apellidos != null) ? apellidos.trim() : null;
     }
 
     public void setEmail(String email) {
+        String emailTemp = (email != null) ? email.trim() : null;
+        emailTemp = (emailTemp != null) ? emailTemp.toLowerCase() : null;
 
-        this.email = (email != null) ? email.trim().toLowerCase() : null;
+     if (emailTemp == null || !emailTemp.contains("@") || !emailTemp.contains(".") || emailTemp.length() > 100){
+         throw new IllegalArgumentException("Email no valido");
+        }else {
+         this.email = emailTemp;
+        }
     }
 
     public void settelefono(String nTelefono) {
+
         this.telefono = (nTelefono != null) ? nTelefono.trim() : null;
+        this.telefono.isEmpty();
     }
 
     public void setDni(String dni) {
@@ -78,6 +88,7 @@ public class Alumno {
     }
 
     public void setPassword(String password) {
+
         this.password = password;
     }
 }

@@ -1,6 +1,6 @@
 ---
 interface Props {
-	title: string;
+    title: string;
     description?: string;
 }
 
@@ -9,33 +9,29 @@ const { title, description = "HITRO - Defensa Personal" } = Astro.props;
 
 <!doctype html>
 <html lang="es" class="scroll-smooth">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content={description} />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-
         <script src="https://unpkg.com/lucide@latest"></script>
-	</head>
+    </head>
 
-    <!-- AQUI ESTÁ LA CLAVE: bg-brand-bg -->
-	<body class="bg-brand-bg text-brand-text antialiased selection:bg-brand-blue selection:text-white">
-		<slot />
-        <script is:inline>
+    <body class="bg-[#050505] text-[#e2e8f0] antialiased">
+        <slot /> <script is:inline>
             if (window.lucide && typeof window.lucide.createIcons === 'function') {
               window.lucide.createIcons();
             }
         </script>
-	</body>
+    </body>
 </html>
 
 <style is:global>
-	body { font-family: "Plus Jakarta Sans", sans-serif; }
+    body { font-family: "Plus Jakarta Sans", sans-serif; }
     h1, h2, h3, h4, h5, h6 { font-family: "Syne", sans-serif; }
 </style>
