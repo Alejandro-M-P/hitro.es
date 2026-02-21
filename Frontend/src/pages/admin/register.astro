@@ -1,0 +1,75 @@
+---
+// src/pages/admin/register.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/index/NavBar.astro';
+---
+
+<Layout title="Registro | HITRO">
+  <Navbar />
+  <main class="pt-24 bg-brand-bg min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full bg-brand-card border border-brand-border rounded-[2rem] p-8 m-4">
+      <h1 class="text-3xl font-display font-black text-white uppercase text-center mb-6">Crear una cuenta</h1>
+      <form id="register-form">
+        <div class="mb-4">
+          <label for="nombre" class="block text-brand-muted font-sans text-sm mb-2">Nombre</label>
+          <input type="text" id="nombre" name="nombre" class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue" required />
+        </div>
+        <div class="mb-4">
+          <label for="apellidos" class="block text-brand-muted font-sans text-sm mb-2">Apellidos</label>
+          <input type="text" id="apellidos" name="apellidos" class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue" required />
+        </div>
+        <div class="mb-4">
+          <label for="email" class="block text-brand-muted font-sans text-sm mb-2">Email</label>
+          <input type="email" id="email" name="email" class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue" required />
+        </div>
+        <div class="mb-4">
+          <label for="password" class="block text-brand-muted font-sans text-sm mb-2">Contraseña</label>
+          <input type="password" id="password" name="password" class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue" required />
+        </div>
+        <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider">
+          Registrarse
+        </button>
+        <p id="error-message" class="text-red-500 text-sm mt-4 text-center"></p>
+        <p class="text-center text-sm text-brand-muted mt-4">
+          ¿Ya tienes una cuenta? <a href="/admin/login" class="text-brand-blue hover:underline">Inicia sesión</a>
+        </p>
+      </form>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { useToast } from '../../hooks/useToast';
+  const toast = useToast();
+  const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
+
+  if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      const errorMessage = document.getElementById('error-message') as HTMLElement;
+      errorMessage.textContent = '';
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          toast.success('¡Registro completado! Ahora puedes iniciar sesión.');
+          window.location.href = '/admin/login';
+        } else {
+          const errorData = await response.json();
+          errorMessage.textContent = errorData.message || 'Error en el registro. Inténtalo de nuevo.';
+        }
+      } catch (error) {
+        console.error('Error en el registro:', error);
+        errorMessage.textContent = 'No se pudo conectar con el servidor.';
+      }
+    });
+  }
+</script>

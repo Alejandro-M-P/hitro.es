@@ -27,4 +27,17 @@ public class AlumnoService {
         return alumno;
 
     }
+
+    public Alumno crearAlumno(es.hitro.backend.dto.RegisterRequest registerRequest) {
+        String passwordEncriptada = passwordEncoder.encode(registerRequest.getPassword());
+        Alumno nuevoAlumno = new Alumno(
+            registerRequest.getNombre(),
+            registerRequest.getApellidos(),
+            registerRequest.getEmail(),
+            null, // telefono is optional
+            null, // dni is optional
+            passwordEncriptada
+        );
+        return alumnoRepository.save(nuevoAlumno);
+    }
 }

@@ -1,6 +1,8 @@
 package es.hitro.backend.controller;
 
 import es.hitro.backend.dto.LoginRequest;
+import es.hitro.backend.dto.RegisterRequest;
+import es.hitro.backend.service.AlumnoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,15 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    public AuthController(AuthenticationManager authenticationManager) {
+    private final AlumnoService alumnoService;
+
+    public AuthController(AuthenticationManager authenticationManager, AlumnoService alumnoService) {
         this.authenticationManager = authenticationManager;
-
+        this.alumnoService = alumnoService;
     }
 
-    public AuthenticationManager getAuthenticationManager() {
-        return authenticationManager;
-    }
-@PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login (@RequestBody LoginRequest loginRequest) {
         try {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
@@ -31,6 +32,16 @@ public class AuthController {
 
         }catch (Exception e) {
             return ResponseEntity.status(401).body("Usuario o contraseña incorrectos");
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+        try {
+            alumnoService.crearAlumno(registerRequest);
+            return ResponseEntity.ok("Usuario registrado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Error en el registro: " + e.getMessage());
         }
     }
 }

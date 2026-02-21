@@ -7,4 +7,15 @@ export default defineConfig({
   integrations: [tailwind()],
   adapter: vercel(),
   output: 'server',
+  vite: {
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '/api'),
+        },
+      },
+    },
+  },
 });

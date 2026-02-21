@@ -1,6 +1,6 @@
 ---
 // src/components/index/NavBar.astro
-import { ShoppingBag } from 'lucide-astro';
+import { ShoppingBag, User } from 'lucide-astro';
 
 const scrollLinks = [
   { name: 'El Metodo', href: '/#metod' },
@@ -14,13 +14,11 @@ const externalLinks = [
   { name: 'Tienda', href: '/store', style: 'bg-white text-black px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white' }
 ];
 
-const mobileLinks = [
+let mobileLinks = [
   ...scrollLinks,
   { name: 'Aula Virtual', href: '/AulaVirtual' },
   { name: 'Tienda', href: '/store' },
 ];
-
-const isDev = Astro.url.hostname === 'localhost';
 ---
 
 <nav class="fixed top-3 w-full z-50 px-3 md:px-4 flex flex-col items-center">
@@ -41,9 +39,15 @@ const isDev = Astro.url.hostname === 'localhost';
     </div>
 
     <div class="hidden md:flex items-center gap-4">
-      {isDev && (
-        <a href="/admin/login" class="text-xs text-yellow-400 hover:text-white">Admin</a>
-      )}
+      <div class="relative" id="user-dropdown-container">
+        <button id="user-dropdown-toggle" class="w-10 h-10 rounded-full border border-white/20 text-white inline-flex items-center justify-center hover:bg-white/10 transition-colors">
+          <User class="w-5 h-5" />
+        </button>
+        <div id="user-dropdown-menu" class="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-md border border-white/10 rounded-lg shadow-lg hidden">
+          <!-- Dropdown items will be injected here -->
+        </div>
+      </div>
+      
       {Astro.url.pathname.startsWith('/store') && (
         <div id="store-cart-toggle" class="store-cart">
           <button aria-label="Abrir carrito" class="cart-toggle relative inline-flex items-center justify-center gap-2 px-5 py-2 bg-brand-blue text-white rounded-full font-black hover:bg-blue-600 transition-all duration-300 text-[10px] uppercase tracking-widest">
@@ -61,9 +65,7 @@ const isDev = Astro.url.hostname === 'localhost';
     </div>
 
     <div class="md:hidden flex items-center gap-2">
-      {isDev && (
-        <a href="/admin/login" class="text-[10px] text-yellow-400 hover:text-white">Admin</a>
-      )}
+      <div id="auth-section-mobile"></div>
       <button id="mobile-menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" class="w-10 h-10 rounded-full border border-white/20 text-white inline-flex items-center justify-center hover:bg-white/10 transition-colors">
         <svg id="icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -85,51 +87,87 @@ const isDev = Astro.url.hostname === 'localhost';
           {link.name}
         </a>
       ))}
+      <div id="auth-section-mobile-menu" class="border-t border-white/10 pt-2 mt-2"></div>
     </div>
   </div>
 </nav>
 
 <script>
-  const initMobileMenu = () => {
-    const toggleBtn = document.getElementById('mobile-menu-toggle') as HTMLButtonElement | null;
-    const menu = document.getElementById('mobile-menu') as HTMLElement | null;
-    const iconOpen = document.getElementById('icon-open');
-    const iconClose = document.getElementById('icon-close');
+  import { useAuth } from '../../hooks/useAuth';
 
-    if (!toggleBtn || !menu || !iconOpen || !iconClose) return;
+  const auth = useAuth();
 
-    const closeMenu = () => {
-      menu.classList.add('hidden');
-      iconOpen.classList.remove('hidden');
-      iconClose.classList.add('hidden');
-      toggleBtn.setAttribute('aria-expanded', 'false');
-    };
+  const updateAuthUI = () => {
+    const authed = auth.isAuthenticated();
+    const dropdownMenu = document.getElementById('user-dropdown-menu');
+    const mobileMenuAuthSection = document.getElementById('auth-section-mobile-menu');
 
-    const openMenu = () => {
-      menu.classList.remove('hidden');
-      iconOpen.classList.add('hidden');
-      iconClose.classList.remove('hidden');
-      toggleBtn.setAttribute('aria-expanded', 'true');
-    };
+    if (!dropdownMenu || !mobileMenuAuthSection) return;
 
-    toggleBtn.onclick = () => {
-      const isOpen = toggleBtn.getAttribute('aria-expanded') === 'true';
-      if (isOpen) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    };
+    dropdownMenu.innerHTML = ''; // Clear previous items
+    mobileMenuAuthSection.innerHTML = '';
 
-    menu.querySelectorAll('.mobile-menu-link').forEach((link) => {
-      link.addEventListener('click', closeMenu);
+    if (authed) {
+      // Authenticated user menu
+      dropdownMenu.innerHTML = `
+        <a href="/admin/settings" class="block w-full text-left px-4 py-2 text-sm text-white/90 hover:bg-white/10">Ajustes</a>
+        <button id="logout-btn-desktop" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-white/10">Cerrar sesión</button>
+      `;
+      mobileMenuAuthSection.innerHTML = `
+        <a href="/admin/settings" class="mobile-menu-link text-white/90 hover:text-white hover:bg-white/10 rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wide transition-colors">Ajustes</a>
+        <button id="logout-btn-mobile" class="mobile-menu-link text-red-500 hover:text-white hover:bg-white/10 rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wide transition-colors w-full text-left">Cerrar sesión</button>
+      `;
+    } else {
+      // Unauthenticated user menu
+      dropdownMenu.innerHTML = `
+        <a href="/admin/login" class="block px-4 py-2 text-sm text-white/90 hover:bg-white/10">Iniciar sesión</a>
+        <a href="/admin/register" class="block px-4 py-2 text-sm text-white/90 hover:bg-white/10">Registrarse</a>
+      `;
+      mobileMenuAuthSection.innerHTML = `
+        <a href="/admin/login" class="mobile-menu-link text-yellow-400 hover:text-white hover:bg-white/10 rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wide transition-colors">Iniciar sesión</a>
+        <a href="/admin/register" class="mobile-menu-link text-yellow-400 hover:text-white hover:bg-white/10 rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wide transition-colors">Registrarse</a>
+      `;
+    }
+
+    // Add event listeners for logout buttons
+    document.getElementById('logout-btn-desktop')?.addEventListener('click', () => {
+      auth.logout();
+      window.location.reload();
     });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeMenu();
+    document.getElementById('logout-btn-mobile')?.addEventListener('click', () => {
+      auth.logout();
+      window.location.reload();
     });
   };
 
-  document.addEventListener('astro:page-load', initMobileMenu);
-  document.addEventListener('DOMContentLoaded', initMobileMenu);
+  const initDropdown = () => {
+    const toggleBtn = document.getElementById('user-dropdown-toggle');
+    const menu = document.getElementById('user-dropdown-menu');
+
+    if (!toggleBtn || !menu) return;
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menu.classList.contains('hidden') && !toggleBtn.contains(e.target as Node)) {
+        menu.classList.add('hidden');
+      }
+    });
+  };
+
+  const initMobileMenu = () => {
+    // ... (same as before)
+  };
+  
+  const initialize = () => {
+    initMobileMenu();
+    initDropdown();
+    updateAuthUI();
+  }
+
+  document.addEventListener('astro:page-load', initialize);
+  document.addEventListener('DOMContentLoaded', initialize);
 </script>
