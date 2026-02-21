@@ -34,7 +34,7 @@ public class AlumnoService {
             registerRequest.getNombre(),
             registerRequest.getApellidos(),
             registerRequest.getEmail(),
-            null, // telefono is optional
+            registerRequest.getTelefono(),
             null, // dni is optional
             passwordEncriptada
         );

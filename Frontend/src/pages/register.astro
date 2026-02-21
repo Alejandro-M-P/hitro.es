@@ -26,6 +26,21 @@ import Navbar from '../components/index/NavBar.astro';
           <label for="password" class="block text-brand-muted font-sans text-sm mb-2">Contraseña</label>
           <input type="password" id="password" name="password" class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue" required />
         </div>
+<div class="mb-4">
+        <label for="telefono" class="block text-brand-muted font-sans text-sm mb-2">
+          Teléfono (Opcional)
+        </label>
+        
+        <input 
+          type="text" 
+          id="telefono" 
+          name="telefono" 
+          class="w-full bg-[#050505] border border-brand-border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue" 
+          placeholder="Ej: 600123456"
+        />
+      </div>
+
+
         <button type="submit" class="w-full bg-brand-blue text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 uppercase tracking-wider">
           Registrarse
         </button>
@@ -63,8 +78,7 @@ import Navbar from '../components/index/NavBar.astro';
           toast.success('¡Registro completado! Ahora puedes iniciar sesión.');
           window.location.href = '/login';
         } else {
-        // En lugar de: const errorData = await response.json();
-// Prueba con esto:
+        
 const errorText = await response.text(); 
 errorMessage.textContent = errorText || 'Error en el registro';
         }

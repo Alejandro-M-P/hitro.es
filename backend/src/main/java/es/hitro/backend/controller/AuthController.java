@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,13 +36,38 @@ public class AuthController {
         }
     }
 
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         try {
             alumnoService.crearAlumno(registerRequest);
             return ResponseEntity.ok("Usuario registrado correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("Error en el registro: " + e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(400).body("El correo " +  registerRequest.getEmail() + " Ya esta en uso" );
+        }catch (Exception e  ){
+            return ResponseEntity.status(500).body("Error inesperado en el servidor");
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login (@RequestBody LoginRequest loginRequest) {
+        try {
+            // 1. Normalizamos lo que viene del usuario
+            String emailNormalizado = loginRequest.getEmail().toLowerCase().trim();
+
+            // 2. Usamos el email ya limpio para crear el token
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                    emailNormalizado,
+                    loginRequest.getPassword()
+            );
+
+            authenticationManager.authenticate(token);
+            return ResponseEntity.ok("Has iniciado correctamente la sesión");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Usuario o contraseña incorrectos");
+        }
+    }
+
+
 }

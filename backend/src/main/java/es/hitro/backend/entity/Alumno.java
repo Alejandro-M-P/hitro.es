@@ -66,8 +66,8 @@ public class Alumno {
     }
 
     public void setEmail(String email) {
-        String emailTemp = (email != null) ? email.trim() : null;
-        emailTemp = (emailTemp != null) ? emailTemp.toLowerCase() : null;
+        String emailTemp = (email != null) ? email.trim().toLowerCase() : null;
+
 
      if (emailTemp == null || !emailTemp.contains("@") || !emailTemp.contains(".") || emailTemp.length() > 100){
          throw new IllegalArgumentException("Email no valido");
@@ -77,9 +77,23 @@ public class Alumno {
     }
 
     public void settelefono(String nTelefono) {
+        // 1. Limpiamos en la variable temporal
+        String temp = (nTelefono != null) ? nTelefono.trim() : null;
 
-        this.telefono = (nTelefono != null) ? nTelefono.trim() : null;
-        this.telefono.isEmpty();
+        // 2. Validamos longitud solo si el usuario escribió algo
+        if (temp != null && !temp.isEmpty()) {
+            if (temp.length() < 9 || temp.length() > 15) {
+                throw new IllegalArgumentException("El teléfono debe tener entre 9 y 15 dígitos");
+            }
+        }
+
+
+        if (temp == null || temp.isEmpty()) {
+            this.telefono = null;
+        } else {
+            this.telefono = temp;
+        }
+        System.out.println("Recibiendo telefono " + nTelefono);
     }
 
     public void setDni(String dni) {

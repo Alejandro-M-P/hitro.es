@@ -1,5 +1,10 @@
 package es.hitro.backend.dto;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 public class LoginRequest {
 
     private String email;
@@ -19,5 +24,7 @@ public class LoginRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+
 
 }
