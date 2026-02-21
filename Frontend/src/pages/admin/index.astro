@@ -9,7 +9,7 @@ const session = Astro.cookies.get('session');
 const isDev = import.meta.env.DEV;
 
 if (!isDev && session?.value !== 'admin') {
-  return Astro.redirect('/admin/login');
+  return Astro.redirect('/login');
 }
 ---
 
@@ -64,8 +64,8 @@ if (!isDev && session?.value !== 'admin') {
   const toast = useToast();
 
   if (import.meta.env.DEV) {
-    if (!auth.isDevAuthenticated()) {
-      window.location.href = '/admin/login';
+    if (!auth.isAuthenticated()) {
+      window.location.href = '/login';
     }
   }
 
@@ -79,7 +79,7 @@ if (!isDev && session?.value !== 'admin') {
     await fetch('/api/logout', { method: 'POST' });
     toast.info('Sesion cerrada');
     window.setTimeout(() => {
-      window.location.href = '/admin/login';
+      window.location.href = '/login';
     }, 300);
   });
 </script>

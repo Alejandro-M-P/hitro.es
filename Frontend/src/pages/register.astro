@@ -1,7 +1,7 @@
 ---
-// src/pages/admin/register.astro
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/index/NavBar.astro';
+// src/pages/register.astro
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/index/NavBar.astro';
 ---
 
 <Layout title="Registro | HITRO">
@@ -31,7 +31,7 @@ import Navbar from '../../components/index/NavBar.astro';
         </button>
         <p id="error-message" class="text-red-500 text-sm mt-4 text-center"></p>
         <p class="text-center text-sm text-brand-muted mt-4">
-          ¿Ya tienes una cuenta? <a href="/admin/login" class="text-brand-blue hover:underline">Inicia sesión</a>
+          ¿Ya tienes una cuenta? <a href="/login" class="text-brand-blue hover:underline">Inicia sesión</a>
         </p>
       </form>
     </div>
@@ -39,7 +39,7 @@ import Navbar from '../../components/index/NavBar.astro';
 </Layout>
 
 <script>
-  import { useToast } from '../../hooks/useToast';
+  import { useToast } from '../hooks/useToast';
   const toast = useToast();
   const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
 
@@ -61,10 +61,12 @@ import Navbar from '../../components/index/NavBar.astro';
 
         if (response.ok) {
           toast.success('¡Registro completado! Ahora puedes iniciar sesión.');
-          window.location.href = '/admin/login';
+          window.location.href = '/login';
         } else {
-          const errorData = await response.json();
-          errorMessage.textContent = errorData.message || 'Error en el registro. Inténtalo de nuevo.';
+        // En lugar de: const errorData = await response.json();
+// Prueba con esto:
+const errorText = await response.text(); 
+errorMessage.textContent = errorText || 'Error en el registro';
         }
       } catch (error) {
         console.error('Error en el registro:', error);

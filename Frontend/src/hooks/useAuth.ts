@@ -21,7 +21,7 @@ export function useAuth() {
   return {
     isAuthenticated,
     getSession,
-    login: async (email, password) => {
+    login: async (email: string, password: string) => {
       try {
         const response = await fetch('/api/auth/login', {
           method: 'POST',

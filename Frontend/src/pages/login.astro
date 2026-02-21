@@ -1,10 +1,10 @@
 ---
-// src/pages/admin/login.astro
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/index/NavBar.astro';
+// src/pages/login.astro
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/index/NavBar.astro';
 ---
 
-<Layout title="Acceso Administracion | HITRO">
+<Layout title="Iniciar Sesión | HITRO">
   <Navbar />
   <main class="pt-24 bg-brand-bg min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full bg-brand-card border border-brand-border rounded-[2rem] p-8 m-4">
@@ -28,8 +28,8 @@ import Navbar from '../../components/index/NavBar.astro';
 </Layout>
 
 <script>
-  import { useAuth } from '../../hooks/useAuth';
-  import { useToast } from '../../hooks/useToast';
+  import { useAuth } from '../hooks/useAuth';
+  import { useToast } from '../hooks/useToast';
 
   const auth = useAuth();
   const toast = useToast();
