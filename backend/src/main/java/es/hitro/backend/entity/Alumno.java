@@ -93,7 +93,7 @@ public class Alumno {
         } else {
             this.telefono = temp;
         }
-        System.out.println("Recibiendo telefono " + nTelefono);
+
     }
 
     public void setDni(String dni) {

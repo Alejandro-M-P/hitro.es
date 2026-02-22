@@ -29,14 +29,27 @@ public class AlumnoService {
     }
 
     public Alumno crearAlumno(es.hitro.backend.dto.RegisterRequest registerRequest) {
+
+        String emailLimp= registerRequest.getEmail().toLowerCase().trim();
+        String TelefonoLimp= registerRequest.getTelefono().trim();
+
+        if (alumnoRepository.existsByEmail(emailLimp)) {
+            throw new IllegalArgumentException("El email ya ha sido registrado");
+
+        }
+        if (alumnoRepository.existsByTelefono(TelefonoLimp)) {
+            throw new IllegalArgumentException("El telefono ya ha sido registrado");
+        }
+
         String passwordEncriptada = passwordEncoder.encode(registerRequest.getPassword());
         Alumno nuevoAlumno = new Alumno(
             registerRequest.getNombre(),
             registerRequest.getApellidos(),
-            registerRequest.getEmail(),
-            registerRequest.getTelefono(),
+            emailLimp,
+            TelefonoLimp,
             null, // dni is optional
             passwordEncriptada
+
         );
         return alumnoRepository.save(nuevoAlumno);
     }

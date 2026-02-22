@@ -25,39 +25,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login (@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
-            authenticationManager.authenticate(token);
-            return ResponseEntity.ok("Has iniciado correctamente la sesion");
+            // 1. Normalizamos el email para que no importen las mayúsculas
+            String emailLimpio = loginRequest.getEmail().trim().toLowerCase();
 
-        }catch (Exception e) {
-            return ResponseEntity.status(401).body("Usuario o contraseña incorrectos");
-        }
-    }
-
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
-        try {
-            alumnoService.crearAlumno(registerRequest);
-            return ResponseEntity.ok("Usuario registrado correctamente");
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(400).body("El correo " +  registerRequest.getEmail() + " Ya esta en uso" );
-        }catch (Exception e  ){
-            return ResponseEntity.status(500).body("Error inesperado en el servidor");
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login (@RequestBody LoginRequest loginRequest) {
-        try {
-            // 1. Normalizamos lo que viene del usuario
-            String emailNormalizado = loginRequest.getEmail().toLowerCase().trim();
-
-            // 2. Usamos el email ya limpio para crear el token
+            // 2. Creamos el token con el email ya normalizado
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    emailNormalizado,
+                    emailLimpio,
                     loginRequest.getPassword()
             );
 
@@ -65,9 +40,21 @@ public class AuthController {
             return ResponseEntity.ok("Has iniciado correctamente la sesión");
 
         } catch (Exception e) {
+            // Si falla, el usuario no sabrá si fue el email o la pass (mejor seguridad)
             return ResponseEntity.status(401).body("Usuario o contraseña incorrectos");
         }
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            alumnoService.crearAlumno(request);
+            return ResponseEntity.ok("Registro completado con éxito");
+        } catch (IllegalArgumentException e) {
 
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error interno del servidor");
+        }
+    }
 }
